@@ -395,7 +395,7 @@ class AsteriskAccess
     public function generateSipPeers()
     {
 
-        $select = 'id, accountcode, name, defaultuser, secret, regexten, amaflags, callerid, language, cid_number, disallow, allow, directmedia, context, dtmfmode, insecure, nat, qualify, type, host, calllimit'; // add
+        $select = 'id, accountcode, name, defaultuser, secret, regexten, amaflags, callerid, language, cid_number, disallow, allow, context, dtmfmode, insecure, nat, qualify, type, host, calllimit'; // add
 
         $list_friend = Sip::model()->findAll();
 
@@ -423,10 +423,6 @@ class AsteriskAccess
                         $codecs = explode(",", $data['allow']);
                         foreach ($codecs as $codec) {
                             $line .= 'allow=' . $codec . "\n";
-                        }
-
-                        if (strlen($data['directmedia']) > 1) {
-                            $line .= 'directmedia=' . $data['directmedia'] . "\n";
                         }
 
                         if (strlen($data['context']) > 1) {

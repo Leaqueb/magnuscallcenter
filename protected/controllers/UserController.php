@@ -57,13 +57,13 @@ class UserController extends BaseController
             $modelSip->context     = 'magnuscallcenter';
             $modelSip->save();
 
-            PeerFileHandler::generateSipFile();
+            AsteriskAccess::generateSipPeers();
         }
     }
 
     public function afterDestroy($values)
     {
-        PeerFileHandler::generateSipFile();
+        AsteriskAccess::generateSipPeers();
     }
 
     public function extraFilterCustomClient($filter)
