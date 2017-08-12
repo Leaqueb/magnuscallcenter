@@ -55,6 +55,10 @@ class TrunkController extends BaseController
     public function setAttributesModels($attributes, $models)
     {
         $trunkRegister = AsteriskAccess::instance()->sipShowRegistry();
+        if (!isset($trunkRegister['data'])) {
+            return $attributes;
+        }
+
         $trunkRegister = explode("\n", $trunkRegister['data']);
 
         for ($i = 0; $i < count($attributes) && is_array($attributes); $i++) {
