@@ -156,7 +156,7 @@ class AsteriskAccess
                     }
 
                     //registrar tronco
-                    if ($key == 'register_string' && preg_match("/^.{3}.*:.{3}.*@.{5}.*\/.{3}.*/", $data['register_string'])) {
+                    if (isset($registerFile) && $key == 'register_string' && preg_match("/^.{3}.*:.{3}.*@.{5}.*\/.{3}.*/", $data['register_string'])) {
                         $registerLine .= 'register=>' . $data['register_string'] . "\n";
                     } elseif ($key == 'encryption' && $option == 'no') {
                         continue;
@@ -172,7 +172,7 @@ class AsteriskAccess
                     }
                 }
 
-                if (fwrite($fr, $registerLine) === false) {
+                if (isset($registerFile) && fwrite($fr, $registerLine) === false) {
                     echo gettext("Impossible to write to the file") . " ($registerLine)";
                     break;
                 }
