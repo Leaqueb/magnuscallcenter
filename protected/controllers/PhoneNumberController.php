@@ -69,7 +69,7 @@ class PhoneNumberController extends BaseController
             $values['id_user'] = Yii::app()->session['id_user'];
         }
 
-        if ($values['id_user'] == 0) {
+        if (isset($values['id_user']) && $values['id_user'] == 0) {
             $values['id_user'] = null;
         }
         return $values;
