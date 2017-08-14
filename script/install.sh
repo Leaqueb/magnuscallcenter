@@ -329,6 +329,15 @@ cd apps/sys-utils/start-stop-daemon-IR1_9_18-2
 gcc start-stop-daemon.c -o start-stop-daemon
 cp start-stop-daemon /usr/sbin/
 
+
+cd /etc/init.d/
+mv /etc/init.d/asterisk /tmp/asterisk_old
+rm -rf /etc/init.d/asterisk
+wget http://magnussolution.com/scriptsSh/asteriskCallCenter
+mv asteriskCallCenter asterisk
+chmod +x /etc/init.d/asterisk
+systemctl daemon-reload
+
 echo "
 4 4 * * * php /var/www/html/callcenter/cron.php CallArchive
 55 3 * * * php /var/www/html/callcenter/cron.php payments
