@@ -8,9 +8,9 @@ class CategoryCommand extends ConsoleCommand
         $day = date('Y-m-d');
 
         //$day = "2015-12-03";
-        sleep(15);
+        //sleep(15);
         $modelCdr = Cdr::model()->findAll(array(
-            'select'    => 'count(*) as countCall, id, id_phonenumber'
+            'select'    => 'count(*) as countCall, id, id_phonenumber',
             'condition' => 'starttime > :key AND id_category IS NULL',
             'params'    => array('key' => $day),
             'group'     => 'id_phonenumber',
@@ -23,16 +23,17 @@ class CategoryCommand extends ConsoleCommand
             //se o numero ainda for categoria ativo ou inativo, deixar para o proximo minuto
             if (!isset($modelPhoneNumber->id_category) || $modelPhoneNumber->id_category < 2) {
                 continue;
-            } else if ($cdr['count'] == 1) {
+            } else if ($cdr->countCall == 1) {
                 $cdr->id_category = $modelPhoneNumber->id_category;
                 $cdr->save();
 
             } else {
-                PhoneNumber::model()->updateAll(array('id_category' => 3), 'id_phonenumber = :key', array(':key' => $cdr->id_phonenumber));
+                echo $cdr->countCall . 'tem mais que 1 ';
+                Cdr::model()->updateAll(array('id_category' => 3), 'id_phonenumber = :key', array(':key' => $cdr->id_phonenumber));
 
-                $modelCdr2 = PhoneNumber::model()->find(array(
+                $modelCdr2 = Cdr::model()->find(array(
                     'condition' => 'id_phonenumber = :key',
-                    'params'    => array(':key' => $cdr->id_phonenumber)
+                    'params'    => array(':key' => $cdr->id_phonenumber),
                     'order'     => 'id DESC',
                 ));
                 $modelCdr2->id_category = $modelPhoneNumber->id_category;
