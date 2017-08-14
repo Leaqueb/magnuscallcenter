@@ -392,7 +392,7 @@ class AsteriskAccess
 
     }
 
-    public function generateSipPeers()
+    public static function generateSipPeers()
     {
 
         $select = 'id, accountcode, name, defaultuser, secret, regexten, amaflags, callerid, language, cid_number, disallow, allow, context, dtmfmode, insecure, nat, qualify, type, host, calllimit'; // add

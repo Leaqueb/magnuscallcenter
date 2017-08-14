@@ -64,6 +64,14 @@ class PhoneNumberController extends BaseController
             ));
             exit;
         }
+
+        if (isset($values['id_user']) && Yii::app()->session['isClient'] || Yii::app()->session['isOperator']) {
+            $values['id_user'] = Yii::app()->session['id_user'];
+        }
+
+        if ($values['id_user'] == 0) {
+            $values['id_user'] = null;
+        }
         return $values;
     }
 
@@ -130,14 +138,6 @@ class PhoneNumberController extends BaseController
             echo false;
         }
 
-    }
-
-    public function actionSave()
-    {
-        $values            = $this->getAttributesRequest();
-        $values['id_user'] = Yii::app()->session['id_user'];
-
-        parent::actionSave();
     }
 
     public function readSetOrder($sort)

@@ -521,10 +521,9 @@ class BaseController extends CController
 
     public function beforeSave($values)
     {
-        if (Yii::app()->session['isClient']) {
+        if (Yii::app()->session['isClient'] || Yii::app()->session['isOperator']) {
             $values['id_user'] = Yii::app()->session['id_user'];
         }
-
         return $values;
     }
 
