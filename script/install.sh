@@ -321,8 +321,13 @@ mysql -uroot -p${password} -e "GRANT FILE ON * . * TO  'CallCenterUser'@'localho
 mysql callcenter -u root -p$password  < /var/www/html/callcenter/doc/script.sql
 
 
+ln -s /var/www/html/callcenter/resources/scripts/AsteriskSoket/AsteriskSocket /etc/init.d/
 
-
+cd /var/www/html/callcenter/resources/scripts/AsteriskSoket/
+tar zxvf apps-sys-utils-start-stop-daemon-IR1_9_18-2.tar.gz
+cd apps/sys-utils/start-stop-daemon-IR1_9_18-2
+gcc start-stop-daemon.c -o start-stop-daemon
+cp start-stop-daemon /usr/sbin/
 
 echo "
 4 4 * * * php /var/www/html/callcenter/cron.php CallArchive

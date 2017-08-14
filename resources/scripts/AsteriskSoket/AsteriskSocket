@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# ln -s /tmp/vendor/AsteriskSocket /etc/init.d/
+# ln -s /var/www/html/callcenter/resources/scripts/AsteriskSoket/AsteriskSocket /etc/init.d/
 
 #cd /usr/local/src
 #wget http://developer.axis.com/download/distribution/apps-sys-utils-start-stop-daemon-IR1_9_18-2.tar.gz
