@@ -252,7 +252,7 @@ cp -n /var/www/html/mbilling/resources/sounds/br/* /var/lib/asterisk/sounds
 
 
 
-echo "[billing]
+echo "[magnuscallcenter]
 exten => _X.,1,AGI("/var/www/html/callcenter/agi.php")
 
 exten => 5555,1,Goto(spycall,\$\{EXTEN\},1)
