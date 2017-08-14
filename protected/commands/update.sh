@@ -25,9 +25,8 @@ fi
 
 cd /var/www/html/callcenter
 ## pull remote git repository
-git fetch --all
-git reset --hard origin/master
 git fetch origin master
+git reset --hard origin/master
 git clean -f -d
 git pull
 
@@ -50,7 +49,6 @@ chmod -R 774 /var/www/html/callcenter/protected/runtime/
 chmod +x /var/www/html/callcenter/agi.php
 mkdir -p /usr/local/src/magnus
 chmod -R 755 /usr/local/src/magnus
-chmod 774 /var/www/html/callcenter/resources/ip.blacklist
 chmod -R 655 /var/www/html/callcenter/tmp
 chmod -R 750 /var/www/html/callcenter/resources/sounds
-chmod -R 770 /var/www/html/callcenter/resources/images
+chmod -R 750 /var/www/html/callcenter/resources/images
