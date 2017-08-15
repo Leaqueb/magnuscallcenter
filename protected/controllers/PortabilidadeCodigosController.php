@@ -34,7 +34,7 @@ class PortabilidadeCodigosController extends BaseController
         $array       = $interpreter->toArray();
         $errors      = array();
         if ($array) {
-            $recorder = new CSVACtiveRecorder($array, 'PortabilidadeCodigos');
+            $recorder = new CSVActiveRecorder($array, 'PortabilidadeCodigos');
             if ($recorder->save()) {
                 $info = 'IMPORT ' . getNumberOfLinesFromFile($_FILES['file']['tmp_name']) . ' CODIGOS RN1 ';
                 MagnusLog::insertLOG('import', $info);

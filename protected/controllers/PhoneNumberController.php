@@ -305,7 +305,7 @@ class PhoneNumberController extends BaseController
         $additionalParams = [['key' => 'id_phonebook', 'value' => $_POST['id_phonebook']]];
         $errors           = array();
         if ($array) {
-            $recorder = new CSVACtiveRecorder($array, 'PhoneNumber', $additionalParams);
+            $recorder = new CSVActiveRecorder($array, 'PhoneNumber', $additionalParams);
             if ($recorder->save());
             $errors = $recorder->getErrors();
 

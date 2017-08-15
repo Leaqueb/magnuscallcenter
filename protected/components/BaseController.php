@@ -1630,7 +1630,7 @@ class BaseController extends CController
         $additionalParams = $this->importCsvSetAdditionalParams();
         $errors           = array();
         if ($array) {
-            $recorder = new CSVACtiveRecorder($array, $this->instanceModel, $additionalParams);
+            $recorder = new CSVActiveRecorder($array, $this->instanceModel, $additionalParams);
             if ($recorder->save());
             $errors = $recorder->getErrors();
 

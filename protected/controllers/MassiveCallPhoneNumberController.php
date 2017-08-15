@@ -39,7 +39,7 @@ class MassiveCallPhoneNumberController extends BaseController
         $additionalParams = [['key' => 'id_massive_call_phonebook', 'value' => $_POST['id_massive_call_phonebook']]];
         $errors           = array();
         if ($array) {
-            $recorder = new CSVACtiveRecorder($array, 'MassiveCallPhoneNumber', $additionalParams);
+            $recorder = new CSVActiveRecorder($array, 'MassiveCallPhoneNumber', $additionalParams);
             if ($recorder->save());
             $errors = $recorder->getErrors();
 
