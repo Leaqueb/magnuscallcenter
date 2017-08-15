@@ -294,29 +294,10 @@ class PhoneNumberController extends BaseController
 
     }
 
-    public function actionImportFromCsv()
+    public function importCsvSetAdditionalParams()
     {
-        ini_set("memory_limit", "1024M");
-        ini_set("upload_max_filesize", "25M");
-        ini_set("max_execution_time", "190");
-
-        $interpreter      = new CSVInterpreter($_FILES['file']['tmp_name']);
-        $array            = $interpreter->toArray();
-        $additionalParams = [['key' => 'id_phonebook', 'value' => $_POST['id_phonebook']]];
-        $errors           = array();
-        if ($array) {
-            $recorder = new CSVActiveRecorder($array, 'PhoneNumber', $additionalParams);
-            if ($recorder->save());
-            $errors = $recorder->getErrors();
-
-        } else {
-            $errors = $interpreter->getErrors();
-        }
-
-        echo json_encode(array(
-            $this->nameSuccess => count($errors) > 0 ? false : true,
-            $this->nameMsg     => count($errors) > 0 ? implode(',', $errors) : $this->msgSuccess,
-        ));
+        $values = $this->getAttributesRequest();
+        return [['key' => 'id_phonebook', 'value' => $values['id_phonebook']]];
     }
 
     public function actionReprocesar()

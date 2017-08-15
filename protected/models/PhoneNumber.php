@@ -53,6 +53,7 @@ class PhoneNumber extends Model
             array('number, state, country, mobile, number_home, number_office, zip_code', 'length', 'max' => 30),
             array('profesion, datebackcall, email,email2,email3,address, creationdate', 'length', 'max' => 50),
             array('sexo, sessiontime', 'length', 'max' => 10),
+            array('cpf', 'length', 'max' => 15),
             array('info, company, birth_date, type_user, mobile_2, option_1, option_2, option_3, option_4, option_5', 'length', 'max' => 100),
         );
     }
