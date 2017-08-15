@@ -68,4 +68,14 @@ class PhoneNumber extends Model
             'idUser'      => array(self::BELONGS_TO, 'User', 'id_user'),
         );
     }
+
+    public function beforeSave()
+    {
+        if ($this->getIsNewRecord() && $this->id_category == 1) {
+            $this->status = 1;
+        }
+        return parent::beforeSave();
+
+    }
+
 }

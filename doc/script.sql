@@ -1127,13 +1127,13 @@ LOCK TABLES `pkg_predictive` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `pkg_preditive_gen`
+-- Table structure for table `pkg_predictive_gen`
 --
 
-DROP TABLE IF EXISTS `pkg_preditive_gen`;
+DROP TABLE IF EXISTS `pkg_predictive_gen`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pkg_preditive_gen` (
+CREATE TABLE `pkg_predictive_gen` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` varchar(20) DEFAULT NULL,
   `uniqueID` varchar(30) DEFAULT NULL,
@@ -1146,12 +1146,12 @@ CREATE TABLE `pkg_preditive_gen` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `pkg_preditive_gen`
+-- Dumping data for table `pkg_predictive_gen`
 --
 
-LOCK TABLES `pkg_preditive_gen` WRITE;
-/*!40000 ALTER TABLE `pkg_preditive_gen` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pkg_preditive_gen` ENABLE KEYS */;
+LOCK TABLES `pkg_predictive_gen` WRITE;
+/*!40000 ALTER TABLE `pkg_predictive_gen` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pkg_predictive_gen` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

@@ -74,8 +74,8 @@ class Campaign extends Model
 
     public function beforeSave()
     {
-        $this->name = preg_replace("/ /", "-", $this->name);
-
+        $this->name        = preg_replace("/ /", "-", $this->name);
+        $this->setqueuevar = $this->setqueueentryvar = $this->setinterfacevar = 'yes';
         for ($i = 1; $i <= 5; $i++) {
 
             if (strlen($this->{"allow_option_" . $i}) == 0) {

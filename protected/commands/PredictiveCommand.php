@@ -43,7 +43,7 @@ class PredictiveCommand extends ConsoleCommand
             $msg = "\n\n\n\nEsperar $pause ";
             $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
 
-            //sleep($pause);
+            sleep($pause);
 
             //da um loop pela quantidade de campanha encontrada
             for ($i = 0; $i < count($modelCampaign); $i++) {
@@ -98,13 +98,13 @@ class PredictiveCommand extends ConsoleCommand
                     $criteria            = new CDbCriteria();
                     $criteria->condition = 'ringing_time > 1 AND id_phonebook IN (SELECT id_phonebook FROM pkg_campaign_phonebook  WHERE id_campaign = :key) ';
                     $criteria->params    = array(':key' => $modelCampaign[$i]->id);
-                    $totalAnswerdCalls   = PreditiveGen::model()->count($criteria);
+                    $totalAnswerdCalls   = PredictiveGen::model()->count($criteria);
 
                     //pego o total de chamadas, atendidas ou nao.
                     $criteria            = new CDbCriteria();
                     $criteria->condition = 'id_phonebook IN (SELECT id_phonebook FROM pkg_campaign_phonebook  WHERE id_campaign = :key) ';
                     $criteria->params    = array(':key' => $modelCampaign[$i]->id);
-                    $totalCalls          = PreditiveGen::model()->count($criteria);
+                    $totalCalls          = PredictiveGen::model()->count($criteria);
 
                     $nbpage = @intval($totalCalls / $totalAnswerdCalls);
                 }
@@ -114,7 +114,7 @@ class PredictiveCommand extends ConsoleCommand
                 $criteria->select    = 'AVG( ringing_time ) AS AVG_ringing_time';
                 $criteria->condition = 'ringing_time > 1 AND id_phonebook IN (SELECT id_phonebook FROM pkg_campaign_phonebook  WHERE id_campaign = :key) ';
                 $criteria->params    = array(':key' => $modelCampaign[$i]->id);
-                $averageRingingTime  = PreditiveGen::model()->findAll($criteria);
+                $averageRingingTime  = PredictiveGen::model()->findAll($criteria);
                 $averageRingingTime  = intval($averageRingingTime);
 
                 $userNotInUse = 0;
@@ -334,7 +334,7 @@ class PredictiveCommand extends ConsoleCommand
                     $call .= "MaxRetries: 0\n";
                     $call .= "RetryTime: 1\n";
                     $call .= "WaitTime: 45\n";
-                    $call .= "Context: billing\n";
+                    $call .= "Context: magnuscallcenter\n";
                     $call .= "Extension: " . $extension . "\n";
                     $call .= "Priority: 1\n";
                     $call .= "Set:CALLERID=" . $phone->number . "\n";
@@ -374,11 +374,11 @@ class PredictiveCommand extends ConsoleCommand
                 PhoneNumber::model()->updateAll(array('id_category' => 0), $criteria);
 
                 //salvamos os dados da chamada gerada
-                $modelPreditiveGen               = new PreditiveGen();
-                $modelPreditiveGen->date         = time();
-                $modelPreditiveGen->uniqueID     = $aleatorio;
-                $modelPreditiveGen->id_phonebook = $phone->id_phonebook;
-                $modelPreditiveGen->save();
+                $modelPredictiveGen               = new PredictiveGen();
+                $modelPredictiveGen->date         = time();
+                $modelPredictiveGen->uniqueID     = $aleatorio;
+                $modelPredictiveGen->id_phonebook = $phone->id_phonebook;
+                $modelPredictiveGen->save();
             }
         }
     }
