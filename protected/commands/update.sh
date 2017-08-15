@@ -49,6 +49,5 @@ chmod -R 774 /var/www/html/callcenter/protected/runtime/
 chmod +x /var/www/html/callcenter/agi.php
 mkdir -p /usr/local/src/magnus
 chmod -R 755 /usr/local/src/magnus
-chmod -R 655 /var/www/html/callcenter/tmp
 chmod -R 750 /var/www/html/callcenter/resources/sounds
 chmod -R 750 /var/www/html/callcenter/resources/images
