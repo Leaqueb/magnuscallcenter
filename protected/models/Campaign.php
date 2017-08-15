@@ -54,7 +54,7 @@ class Campaign extends Model
                     allow_fone_parente1,allow_parente2,allow_fone_parente2,allow_parente3,allow_fone_parente3,
                     allow_vizinho1,allow_telefone_vizinho1,allow_vizinho2,allow_telefone_vizinho2,
                     allow_vizinho3,allow_telefone_vizinho3, timeout, retry, wrapuptime, weight,
-                    periodic-announce-frequency, announce-frequency', 'numerical', 'integerOnly' => true),
+                    periodic-announce-frequency, announce-frequency, call_limit, call_next_try, predictive', 'numerical', 'integerOnly' => true),
             array('name, description', 'length', 'max' => 100),
             array('status', 'length', 'max' => 1),
             array('startingdate, expirationdate, allow_option_1_type, allow_option_2_type, allow_option_3_type,

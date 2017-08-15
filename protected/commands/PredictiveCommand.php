@@ -2,66 +2,57 @@
 class PredictiveCommand extends ConsoleCommand
 {
     public $portabilidade = false;
-    private $host         = 'localhost';
-    private $user         = 'magnus';
-    private $password     = 'magnussolution';
 
     public function run($args)
     {
 
-        include_once "/var/www/html/callcenter/protected/commands/AGI.Class.php";
-        $asmanager       = new AGI_AsteriskManager;
-        $conectaServidor = $conectaServidor = $asmanager->connect($this->host, $this->user, $this->password);
+        $this->debug = 10;
 
+        //$channel = AsteriskAccess::getCoreShowChannel($_POST['channel']);
         /*
+        Objetivo:
         menor tempo possivel de operadora ocioso.
         sem queimar numero
 
+        Pegar as campanhas com predictive ativo
+        Verificar quantos operadores tem na campanha com o status FREE
+        Pegar a quantidade de numeros a ser enviado por operadora
+        buscar os números de cada uma das campanha com o total de numeros no LIMIT
+        executar las llamadas
+
          */
 
-        //mirar que campanha tiene predictive
-        //mirar cuantos usuarios tiene sin llamar en esta cada una de las campañas
-        //get la cantidade de numeros por cada operador sin llamar en configuraçciones
-        //buscar los numeros de cada una de estas campanha con el LIMIT
-        //executar las llamadas
-
-        //tempo de pausa entre cada campanha
+        //Tempo de pausa entre cada campanha
         $pause      = 4;
         $operadores = array();
 
-        $log = DEBUG >= 0 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' start predictive ' . date('Y-m-d H:i:s')) : null;
+        $log = $this->debug >= 0 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' start predictive ' . date('Y-m-d H:i:s')) : null;
 
         for (;;) {
 
             //select active campaign
-            $sql            = "SELECT * FROM pkg_campaign WHERE predictive = 1 AND status = 1";
-            $campaignResult = Yii::app()->db->createCommand($sql)->queryAll();
+            $modelCampaign = Campaign::model()->findAll('predictive = 1 AND status = 1');
 
-            if (count($campaignResult) == 0) {
+            if (!count($modelCampaign)) {
                 $msg = 'Not exists campaign with active predictive';
-                $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
+                $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
                 sleep($pause);
                 continue;
             }
 
             $msg = "\n\n\n\nEsperar $pause ";
-            $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
+            $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
 
-            sleep($pause);
-
-            $UNIX_TIMESTAMP = "UNIX_TIMESTAMP(";
-            $tab_day        = array(1 => 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
-            $name_day       = $tab_day[date('N')];
+            //sleep($pause);
 
             //da um loop pela quantidade de campanha encontrada
-            for ($i = 0; $i < count($campaignResult); $i++) {
+            for ($i = 0; $i < count($modelCampaign); $i++) {
+                $time = date('H:i:s');
 
                 //verificar se esta dentro de uma pausa obrigatoria. Se estiver nao mandar chamada.
-                $sql = "SELECT * FROM pkg_breaks WHERE '" . date('H:i:s') . "' > start_time AND
-									'" . date('H:i:s') . "' < stop_time AND obrigatoria = 1";
-                $pausaResult = Yii::app()->db->createCommand($sql)->queryAll();
+                $modelBreaks = Breaks::model()->find('mandatory = 1 AND :key > start_time AND :key < stop_time', array(':key' => $time));
 
-                if (count($pausaResult) > 0) {
+                if (count($modelBreaks)) {
                     echo "Nao enviar chamada porque estamos em pausa obrigatoria";
                     sleep(1);
                     continue;
@@ -69,16 +60,16 @@ class PredictiveCommand extends ConsoleCommand
 
                 $nowtime = date('H:s');
 
-                if ($nowtime > $campaignResult[$i]['daily_morning_start_time'] &&
-                    $nowtime < $campaignResult[$i]['daily_morning_stop_time']) {
+                if ($nowtime > $modelCampaign[$i]->daily_morning_start_time &&
+                    $nowtime < $modelCampaign[$i]->daily_morning_stop_time) {
                     //echo "turno manha";
-                } elseif ($nowtime > $campaignResult[$i]['daily_afternoon_start_time'] &&
-                    $nowtime < $campaignResult[$i]['daily_afternoon_stop_time']) {
+                } elseif ($nowtime > $modelCampaign[$i]->daily_afternoon_start_time &&
+                    $nowtime < $modelCampaign[$i]->daily_afternoon_stop_time) {
                     //echo "Turno Tarde";
                 } else {
                     echo "sem turno agora";
-                    $log = DEBUG >= 0 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ .
-                        ' Campanha fora de turno' . $campaignResult[$i]['name']) : null;
+                    $log = $this->debug >= 0 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ .
+                        ' Campanha fora de turno' . $modelCampaign[$i]['name']) : null;
                     continue;
                 }
 
@@ -87,58 +78,64 @@ class PredictiveCommand extends ConsoleCommand
                 EX: se for 30, o preditivo envia as chamadas, e se o operadora continuar livre por
                 30 segundos, o sistema ira enviar mais chamada para ele.
                  */
-                $sleepTime = $campaignResult[0]["call_next_try"];
+                $sleepTime = $modelCampaign[$i]->call_next_try;
 
                 /*
                 call_limit = 0, sera calculado automatico o total de chamada a ser enviado por cada operador usando $nbpage.
                 call_limit > 0, subscreveta a varialvem $nbpage e sera usando como o total de chamada por cada operador
                  */
 
-                $call_limit = $campaignResult[0]["call_limit"];
+                $call_limit = $modelCampaign[$i]->call_limit;
 
                 //se call_limit > 0, nao precisa calcular o $nbpage
                 if ($call_limit == 0) {
                     /*
-                    total de chamadas / pelas atendidas: Ex: foi realizado 100 chamadas e atendidas 40. $nbpage sera 2.5 intval 2
-                    ESta variavel $nbpage, sera usada para calcular quantas chamadas devera ser enviada para cada operadora livre.
+                    Total de chamadas / pelas atendidas: Ex: foi realizado 100 chamadas e atendidas 40. $nbpage sera 2.5 intval 2
+                    Esta variavel $nbpage, sera usada para calcular quantas chamadas devera ser enviada para cada operadora livre.
                      */
 
                     //verifico o total de chamadas que foram ATENDIDAS da campanha,
-                    $sql = "SELECT count(*) total  FROM pkg_preditive_gen WHERE id_phonebook IN
-									(SELECT id_phonebook FROM pkg_campaign_phonebook
-									WHERE id_campaign = " . $campaignResult[$i]['id'] . ") AND ringing_time > 1 ";
-                    $callAnswerResult = Yii::app()->db->createCommand($sql)->queryAll();
+                    $criteria            = new CDbCriteria();
+                    $criteria->condition = 'ringing_time > 1 AND id_phonebook IN (SELECT id_phonebook FROM pkg_campaign_phonebook  WHERE id_campaign = :key) ';
+                    $criteria->params    = array(':key' => $modelCampaign[$i]->id);
+                    $totalAnswerdCalls   = PreditiveGen::model()->count($criteria);
 
                     //pego o total de chamadas, atendidas ou nao.
-                    $sql = "SELECT count(*) total FROM pkg_preditive_gen WHERE id_phonebook IN
-		        					(SELECT id_phonebook FROM pkg_campaign_phonebook WHERE id_campaign = " . $campaignResult[$i]['id'] . ")";
-                    $callTotalResult = Yii::app()->db->createCommand($sql)->queryAll();
+                    $criteria            = new CDbCriteria();
+                    $criteria->condition = 'id_phonebook IN (SELECT id_phonebook FROM pkg_campaign_phonebook  WHERE id_campaign = :key) ';
+                    $criteria->params    = array(':key' => $modelCampaign[$i]->id);
+                    $totalCalls          = PreditiveGen::model()->count($criteria);
 
-                    $nbpage = @intval($callTotalResult[0]['total'] / $callAnswerResult[0]['total']);
+                    $nbpage = @intval($totalCalls / $totalAnswerdCalls);
                 }
 
                 //calculo o tempo medio do RING que as chamadas ATENDIDAS estao demorando
-                $sql           = "SELECT AVG( ringing_time ) AS AVG_ringing_time FROM  pkg_preditive_gen WHERE id_phonebook IN (SELECT id_phonebook FROM pkg_campaign_phonebook WHERE id_campaign = " . $campaignResult[$i]['id'] . ") AND ringing_time > 0 ";
-                $ringingResult = Yii::app()->db->createCommand($sql)->queryAll();
-                $ringing_time  = intval($ringingResult[0]['AVG_ringing_time']);
-
-                $log = DEBUG >= 0 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ringingResult' . print_r($ringingResult, true)) : null;
+                $criteria            = new CDbCriteria();
+                $criteria->select    = 'AVG( ringing_time ) AS AVG_ringing_time';
+                $criteria->condition = 'ringing_time > 1 AND id_phonebook IN (SELECT id_phonebook FROM pkg_campaign_phonebook  WHERE id_campaign = :key) ';
+                $criteria->params    = array(':key' => $modelCampaign[$i]->id);
+                $averageRingingTime  = PreditiveGen::model()->findAll($criteria);
+                $averageRingingTime  = intval($averageRingingTime);
 
                 $userNotInUse = 0;
                 //Inicio a verificacao do status dos operadores da campanha
-                $msg    = 'queue show "' . $campaignResult[$i]['name'] . '"';
-                $log    = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
-                $server = $asmanager->Command('queue show "' . $campaignResult[$i]['name'] . '"');
-                $log    = DEBUG >= 2 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . print_r(explode("\n", $server["data"]), true)) : null;
+                $server = AsteriskAccess::instance()->queueShow($modelCampaign[$i]->name);
+
+                $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . 'queue show ' . $modelCampaign[$i]->name) : null;
+
+                $log = $this->debug >= 2 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . print_r(explode("\n", $server['data']), true)) : null;
 
                 //$operadores contem os operadores livres e o time que foi enviado a ultima chamada.
 
                 foreach (explode("\n", $server["data"]) as $key => $value) {
+
                     //Quantos operadores estao com status not in use
                     if (!preg_match("/paused/", $value) && preg_match("/Not in use/", $value)) {
+
                         $operador = explode(" ", substr(trim($value), 4));
                         $operador = $operador[0];
-                        $s        = 0;
+
+                        $s = 0;
 
                         foreach ($operadores as $key => $value2) {
 
@@ -147,13 +144,13 @@ class PredictiveCommand extends ConsoleCommand
                             if (array_key_exists($operador, $value2)) {
 
                                 if (($value2[$operador] + $sleepTime) > time()) {
-                                    $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ .
+                                    $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ .
                                         " Acabamos de gerar uma chamada para operador $operador nao gerar outra: " . gmdate("Y-m-d H:i:s", $value2[$operador])) : null;
                                     continue 2;
                                 } else {
                                     if (isset($operadores[$s])) {
                                         $msg = "Refazer chamada para o $operador unset(" . print_r($operadores[$s], true) . ")";
-                                        $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
+                                        $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
                                         //removemos de $operadores para adicionaremos abaixo com o novo tempo.
                                         unset($operadores[$s]);
                                     }
@@ -164,7 +161,7 @@ class PredictiveCommand extends ConsoleCommand
                         }
 
                         $msg = "Tem operador livre $operador";
-                        $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
+                        $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
                         //adicionamos em operadores com o time
                         $operadores[] = array($operador => time());
                         $userNotInUse++;
@@ -177,16 +174,16 @@ class PredictiveCommand extends ConsoleCommand
                         $sql             = "SELECT id FROM pkg_user WHERE username = '$operador'";
                         $userPauseResult = Yii::app()->db->createCommand($sql)->queryAll();
 
-                        $sql             = "SELECT time_start_cat, media_to_cat FROM pkg_call_online WHERE id_user = " . $userPauseResult[0]['id'];
+                        $sql             = "SELECT time_start_cat, media_to_cat FROM pkg_call_online WHERE id_user = " . $userPauseResult[0]->id;
                         $userPauseResult = Yii::app()->db->createCommand($sql)->queryAll();
                         /*
                         vamos tentar prever quando o operador ficara livre, pegando tempo medio que ele gasta para categorizar
                          */
-                        if (isset($userPauseResult[0]['time_start_cat'])) {
+                        if (isset($userPauseResult[0]->time_start_cat)) {
 
-                            $pauseTime = time() - $userPauseResult[0]['time_start_cat'];
+                            $pauseTime = time() - $userPauseResult[0]->time_start_cat;
                             //se o tempo em pausa for maior que (media pausa - media ring ) e menor que a media iniciar chamada
-                            if ($pauseTime > ($userPauseResult[0]['media_to_cat'] - $ringing_time) && $pauseTime < $userPauseResult[0]['media_to_cat']) {
+                            if ($pauseTime > ($userPauseResult[0]->media_to_cat - $averageRingingTime) && $pauseTime < $userPauseResult[0]->media_to_cat) {
 
                                 $p = 0;
                                 foreach ($operadores as $key => $value3) {
@@ -195,14 +192,14 @@ class PredictiveCommand extends ConsoleCommand
 
                                         if (($value3[$operador] + $sleepTime) > time()) {
 
-                                            $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . " ---------->TENTAR Acabamos de gerar uma chamada para operador $operador nao gerar outra: " . gmdate("Y-m-d H:i:s", $value3[$operador])) : null;
+                                            $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . " ---------->TENTAR Acabamos de gerar uma chamada para operador $operador nao gerar outra: " . gmdate("Y-m-d H:i:s", $value3[$operador])) : null;
                                             break;
                                         } else {
                                             if (isset($operadores[$p])) {
-                                                $msg = "TENTAR enviar chamada para operadora   " . print_r($operador, true) . " esta em pausa a " . $pauseTime . "s e sua media de categorizacao é " . $userPauseResult[0]['media_to_cat'] . 's, e o tempo ringando é ' . $ringing_time . 's';
-                                                $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
+                                                $msg = "TENTAR enviar chamada para operadora   " . print_r($operador, true) . " esta em pausa a " . $pauseTime . "s e sua media de categorizacao é " . $userPauseResult[0]->media_to_cat . 's, e o tempo ringando é ' . $averageRingingTime . 's';
+                                                $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
                                                 $msg = "TENTAR Tem operador livre $operador";
-                                                $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
+                                                $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
                                                 unset($operadores[$s]);
                                                 $operadores[] = array($operador => time());
                                                 $userNotInUse++;
@@ -224,26 +221,24 @@ class PredictiveCommand extends ConsoleCommand
                 //evitamos de que se tem chamadas em espera e tem operador livre, nao geramos para evitar queimar numeros
                 if ($totalCalls > $userNotInUse) {
                     $msg   = " No send call, becouse have call: total call " . $totalCalls . ', operator not in use' . $userNotInUse;
-                    $log   = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
+                    $log   = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
                     $pause = 4;
                     continue;
                 }
 
                 if ($userNotInUse == 0) {
                     $msg   = "Not have free operador";
-                    $log   = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
+                    $log   = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
                     $pause = 4;
                     //if no have user free, continue to next.
                     continue;
                 }
 
                 $msg = "Tem $userNotInUse operador disponivel";
-                $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
+                $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
 
                 $msg = "Tentar enviar chamadas\n";
-                $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
-
-                $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' LOG:' . "Total de livres $userNotInUse") : null;
+                $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
 
                 if ($call_limit == 0) {
                     $nbpage = $nbpage * $userNotInUse;
@@ -254,64 +249,70 @@ class PredictiveCommand extends ConsoleCommand
 
                     if ($nbpage > 10) {
                         //evita mandar mais que 10 chamadas por operador, mesmo se o ASR da campanha for ruin
-                        $log    = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' O ASR da campanha ' . $campaignResult[$i]['name'] . " esta muito baixo") : null;
+                        $log    = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' O ASR da campanha ' . $modelCampaign[$i]->name . " esta muito baixo") : null;
                         $nbpage = 10;
                     }
-                    $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . 'LOG:' . "LIMIT automatico $nbpage ") : null;
+                    $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . 'LOG:' . "LIMIT automatico $nbpage ") : null;
                 } else {
                     $nbpage = $call_limit * $userNotInUse;
-                    $log    = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . 'LOG:' . "LIMIT manual= $nbpage ") : null;
+                    $log    = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . 'LOG:' . "LIMIT manual= $nbpage ") : null;
                 }
 
+                //get all campaign phonebook
+                $modelCampaignPhonebook = CampaignPhonebook::model()->findAll('id_campaign = :key', array(':key' => $modelCampaign[$i]->id));
+                $ids_phone_books        = array();
+                foreach ($modelCampaignPhonebook as $key => $phonebook) {
+                    $ids_phone_books[] = $phonebook->id_phonebook;
+                }
                 $datebackcall = date('Y-m-d H:i', mktime(date('H'), date('i') - 10, date('s'), date('m'), date('d'), date('Y')));
 
-                $sql = "SELECT t.id, t.number, pkg_phonebook.id_trunk, t.id_phonebook, pkg_campaign_phonebook.id_campaign, t.id_category, datebackcall
-					FROM  pkg_phonenumber t
-					INNER JOIN pkg_phonebook ON t.id_phonebook = pkg_phonebook.id
-					INNER JOIN pkg_campaign_phonebook ON pkg_campaign_phonebook.id_phonebook = pkg_phonebook.id
-					WHERE pkg_campaign_phonebook.id_campaign = " . $campaignResult[$i]['id'] . "
-					AND t.id_category = 1 OR ( t.id_category = 2 AND datebackcall BETWEEN '" . $datebackcall . "' AND NOW())
-					ORDER BY t.datebackcall DESC
-					LIMIT 0, $nbpage";
+                $criteria = new CDbCriteria();
+                $criteria->addCondition('id_phonebook IN ( SELECT id_phonebook FROM pkg_campaign_phonebook WHERE id_campaign = :key1 ) AND id_category = 1 OR ( id_category = 2 AND datebackcall BETWEEN :key AND NOW())');
+                $criteria->params[':key']  = $datebackcall;
+                $criteria->params[':key1'] = $modelCampaign[$i]->id;
+                $criteria->order           = 'datebackcall DESC';
+                $criteria->limit           = $nbpage;
+                $modelPhoneNumber          = PhoneNumber::model()->findAll($criteria);
 
-                $callResult = Yii::app()->db->createCommand($sql)->queryAll();
+                $log = $this->debug >= 5 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . $sql) : null;
 
-                $log = DEBUG >= 5 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . $sql) : null;
-
-                if (count($callResult) == 0) {
+                if (!count($modelPhoneNumber)) {
                     echo $sql;
                     echo 'NO PHONE FOR CALL';
-                    $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . " NO PHONE FOR CALL") : null;
+                    $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . " NO PHONE FOR CALL") : null;
                     continue;
                 }
+                $ids = array();
+                foreach ($modelPhoneNumber as $phone) {
 
-                foreach ($callResult as $phone) {
+                    $destination = $phone->number;
 
-                    $destination = $phone['number'];
-
-                    $destination = Portabilidade::getDestination($destination, $phone['id_phonebook']);
-                    if ($phone['number'] != $destination) {
+                    $destination = Portabilidade::getDestination($destination, $phone->id_phonebook);
+                    if ($phone->number != $destination) {
                         //55341 5551982464731
-                        $rn1                 = substr($phonenumber, 0, 5);
-                        $sql                 = "SELECT * FROM pkg_trunk WHERE id IN (SELECT id_trunk FROM pkg_codigos_trunks WHERE id_codigo IN (SELECT id FROM pkg_codigos WHERE company = (SELECT company FROM pkg_codigos WHERE prefix = '$rn1')) ) ORDER BY RAND()";
-                        $resultPortabilidade = Yii::app()->db->createCommand($sql)->queryAll();
+                        $rn1      = substr($phonenumber, 0, 5);
+                        $criteria = new CDbCriteria();
+                        $criteria->addCondition('id IN ( SELECT id_trunk FROM pkg_codigos_trunks WHERE id_codigo IN (SELECT id FROM pkg_codigos WHERE company = (SELECT company FROM pkg_codigos WHERE prefix = :key)) )');
+                        $criteria->params[':key'] = $rn1;
+                        $criteria->order          = 'RAND()';
+                        $criteria->limit          = $nbpage;
+                        $modelTrunkPortabilidade  = Trunk::model()->find($criteria);
 
-                        if (count($resultPortabilidade) > 0) {
-                            $phone['id_trunk'] = $resultPortabilidade[0]['id'];
+                        if (count($modelTrunkPortabilidade)) {
+                            $phone->idPhonebook->id_trunk = $modelTrunkPortabilidade->id;
                         } else {
                             $agi->verbose('Portabilidade ativa, mas sem tronco para ' . $rn1, 3);
                         }
                     }
 
-                    $log = DEBUG >= 4 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . " DESTINATION " . $destination) : null;
+                    $log = $this->debug >= 4 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . " DESTINATION " . $destination) : null;
 
-                    $sql          = "SELECT * FROM pkg_trunk WHERE id = '" . $phone['id_trunk'] . "' ";
-                    $resultTrunk  = Yii::app()->db->createCommand($sql)->queryAll();
-                    $idTrunk      = $resultTrunk[0]['id'];
-                    $trunkcode    = $resultTrunk[0]['trunkcode'];
-                    $trunkprefix  = $resultTrunk[0]['trunkprefix'];
-                    $removeprefix = $resultTrunk[0]['removeprefix'];
-                    $providertech = $resultTrunk[0]['providertech'];
+                    $modelTrunk   = Trunk::model()->findByPk((int) $phone->idPhonebook->id_trunk);
+                    $idTrunk      = $modelTrunk->id;
+                    $trunkcode    = $modelTrunk->trunkcode;
+                    $trunkprefix  = $modelTrunk->trunkprefix;
+                    $removeprefix = $modelTrunk->removeprefix;
+                    $providertech = $modelTrunk->providertech;
 
                     $extension = $destination;
                     //retiro e adiciono os prefixos do tronco
@@ -336,20 +337,20 @@ class PredictiveCommand extends ConsoleCommand
                     $call .= "Context: billing\n";
                     $call .= "Extension: " . $extension . "\n";
                     $call .= "Priority: 1\n";
-                    $call .= "Set:CALLERID=" . $phone['number'] . "\n";
+                    $call .= "Set:CALLERID=" . $phone->number . "\n";
                     $call .= "Set:CALLED=" . $extension . "\n";
-                    $call .= "Set:PHONENUMBER_ID=" . $phone['id'] . "\n";
-                    $call .= "Set:IDPHONEBOOK=" . $phone['id_phonebook'] . "\n";
-                    $call .= "Set:CAMPAIGN_ID=" . $phone['id_campaign'] . "\n";
-                    $call .= "Set:IDTRUNK=" . $phone['id_trunk'] . "\n";
+                    $call .= "Set:PHONENUMBER_ID=" . $phone->id . "\n";
+                    $call .= "Set:IDPHONEBOOK=" . $phone->id_phonebook . "\n";
+                    $call .= "Set:CAMPAIGN_ID=" . $modelCampaign[$i]->id . "\n";
+                    $call .= "Set:IDTRUNK=" . $phone->idPhonebook->id_trunk . "\n";
                     $call .= "Set:STARTCALL=" . time() . "\n";
                     $call .= "Set:ALEARORIO=" . $aleatorio . "\n";
 
-                    $log = DEBUG >= 4 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . $call) : null;
+                    $log = $this->debug >= 4 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . $call) : null;
 
                     $msg = "Enviado chamada para  $extension";
                     echo 'LOG:' . $msg . "\n";
-                    $log = DEBUG >= 1 ? MagnusLog::writeMagnusLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
+                    $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
 
                     $arquivo_call = "/tmp/$aleatorio.call";
 
@@ -357,25 +358,28 @@ class PredictiveCommand extends ConsoleCommand
                     fwrite($fp, $call);
                     fclose($fp);
 
-                    touch("$arquivo_call", mktime(date("H"), date("i"), date("s") + 1, date("m"), date("d"), date("Y")));
+                    $time += time();
+                    touch("$arquivo_call", $time);
                     chown("$arquivo_call", "asterisk");
                     chgrp("$arquivo_call", "asterisk");
                     chmod("$arquivo_call", 0755);
-                    exec("mv $arquivo_call /var/spool/asterisk/outgoing/$aleatorio.call");
+                    LinuxAccess::system("mv $arquivo_call /var/spool/asterisk/outgoing/$aleatorio.call");
 
-                    //system("cat /var/spool/asterisk/outgoing/$aleatorio.call");
-
-                    //desativamos o numero para nao ser usado novamente.
-                    $sql = "UPDATE pkg_phonenumber SET id_category = 0 WHERE id = " . $phone['id'];
-                    Yii::app()->db->createCommand($sql)->execute();
-
-                    //salvamos os dados da chamada gerada
-                    $sql = "INSERT INTO pkg_preditive_gen (date, uniqueID,id_phonebook) VALUES ('" . time() . "', " . $aleatorio . ", " . $phone['id_phonebook'] . ")";
-                    Yii::app()->db->createCommand($sql)->execute();
+                    $ids[] = $phone->id;
                 }
+
+                //desativamos o numero para nao ser usado novamente.
+                $criteria = new CDbCriteria();
+                $criteria->addInCondition('id', $ids);
+                PhoneNumber::model()->updateAll(array('id_category' => 0), $criteria);
+
+                //salvamos os dados da chamada gerada
+                $modelPreditiveGen               = new PreditiveGen();
+                $modelPreditiveGen->date         = time();
+                $modelPreditiveGen->uniqueID     = $aleatorio;
+                $modelPreditiveGen->id_phonebook = $phone->id_phonebook;
+                $modelPreditiveGen->save();
             }
-
         }
-
     }
 }

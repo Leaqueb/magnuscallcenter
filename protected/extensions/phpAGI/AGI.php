@@ -153,7 +153,7 @@ class AGI
      * @param string $config is the name of the config file to parse
      * @param array $optconfig is an array of configuration vars and vals, stuffed into $this->config['phpagi']
      */
-    public function __construct($config = null, $optconfig = array())
+    public function AGI($config = null, $optconfig = array())
     {
         // load config
         if (!is_null($config) && file_exists($config)) {
@@ -307,7 +307,7 @@ class AGI
      * @link http://www.voip-info.org/wiki-database+del
      * @param string $family
      * @param string $key
-     * @return array, see evaluate for return information. ['result'] is 1 on sucess, 0 otherwise.
+     * @return array, see evaluate for return information. ['result'] is 1 on success, 0 otherwise.
      */
 
     public function database_del($family, $key)
@@ -321,7 +321,7 @@ class AGI
      * @link http://www.voip-info.org/wiki-database+deltree
      * @param string $family
      * @param string $keytree
-     * @return array, see evaluate for return information. ['result'] is 1 on sucess, 0 otherwise.
+     * @return array, see evaluate for return information. ['result'] is 1 on success, 0 otherwise.
      */
     public function database_deltree($family, $keytree = '')
     {
@@ -339,7 +339,7 @@ class AGI
      * @link http://www.voip-info.org/wiki-database+get
      * @param string $family
      * @param string $key
-     * @return array, see evaluate for return information. ['result'] is 1 on sucess, 0 failure. ['data'] holds the value
+     * @return array, see evaluate for return information. ['result'] is 1 on success, 0 failure. ['data'] holds the value
      */
     public function database_get($family, $key)
     {
@@ -352,7 +352,7 @@ class AGI
      * @param string $family
      * @param string $key
      * @param string $value
-     * @return array, see evaluate for return information. ['result'] is 1 on sucess, 0 otherwise
+     * @return array, see evaluate for return information. ['result'] is 1 on success, 0 otherwise
      */
     public function database_put($family, $key, $value)
     {
@@ -759,7 +759,7 @@ class AGI
      *
      * @link http://www.voip-info.org/wiki-tdd+mode
      * @param string $setting can be on, off or mate
-     * @return array, see evaluate for return information. ['result'] is 1 on sucess, 0 if the channel is not TDD capable.
+     * @return array, see evaluate for return information. ['result'] is 1 on success, 0 if the channel is not TDD capable.
      */
     public function tdd_mode($setting)
     {
@@ -1257,7 +1257,7 @@ class AGI
      *   array('1'=>'*Press 1 for this', // festival reads if prompt starts with *
      *         '2'=>'some-gsm-without-extension',
      *         '*'=>'*Press star for help');
-     * @return mixed key pressed on sucess, -1 on failure
+     * @return mixed key pressed on success, -1 on failure
      */
     public function menu($choices, $timeout = 2000)
     {
