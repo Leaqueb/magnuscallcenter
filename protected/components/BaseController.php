@@ -203,6 +203,16 @@ class BaseController extends CController
         $this->start = isset($value[$this->nameParamStart]) ? $value[$this->nameParamStart] : -1;
     }
 
+    public function setGroup($value)
+    {
+    	 if (isset($_GET['group'])) {
+            $this->group = json_decode($_GET['group']);
+            $_GET[$this->nameParamSort] = $this->group->property;
+
+            $_GET[$this->nameParamDir] = $this->group->direction;
+        }
+    }
+
     public function setLimit($value)
     {
         $limit       = isset($value[$this->nameParamLimit]) ? $value[$this->nameParamLimit] : -1;
@@ -254,6 +264,7 @@ class BaseController extends CController
             echo '$this->relationFilter = ';
             print_r($this->relationFilter);
             echo "<br><br>";
+             print_r($this->group);
             exit;
         }
         if (strlen($this->filter) > 1 && $this->defaultFilter == 1 && $this->start > 0) {
@@ -270,6 +281,7 @@ class BaseController extends CController
             'order'     => $this->order,
             'limit'     => $this->limit,
             'offset'    => $this->start,
+            'group'    => $this->group,
         ));
 
     }
@@ -310,6 +322,8 @@ class BaseController extends CController
         $this->setLimit($_GET);
 
         $this->setStart($_GET);
+
+        $this->setGroup($_GET);       
 
         $this->setSort();
 

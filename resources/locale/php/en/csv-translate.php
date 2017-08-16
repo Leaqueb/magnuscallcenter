@@ -14,7 +14,7 @@
     'mobile'                   => ['celular'],
     'number_home'              => ['telefone residencial', 'fixo'],
     'number_office'            => ['telefone trabalho'],
-    'company'                  => ['company', 'empresa'],
+    'company'                  => ['company', 'empresa', 'operadora'],
     'edad'                     => ['idade'],
     'profesion'                => ['profissao', 'profissão'],
     'mobile_2'                 => ['celular_2', 'celular 2'],
@@ -35,5 +35,6 @@
     'telefone_fixo_comercial1' => ['telefone fixo comercial 1'],
     'telefone_fixo_comercial2' => ['telefone fixo comercial 2'],
     'telefone_fixo_comercial3' => ['telefone fixo comercial 3'],
+    'prefix'                   => ['prefixo', 'codigo', 'rn1'],
 
 ]?>

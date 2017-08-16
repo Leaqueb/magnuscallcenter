@@ -54,8 +54,7 @@ class CSVActiveRecorder
         " INTO TABLE " . $tableName .
         " CHARACTER SET UTF8 " .
         " FIELDS TERMINATED BY '" . $this->data['boundaries']['delimiter'] . "'" .
-            " LINES TERMINATED BY '\n'" .
-            " IGNORE 1 LINES";
+            " LINES TERMINATED BY '\\r\\n' IGNORE 1 LINES";
 
         $sql .= " (" . implode(",", array_map(
             function ($v) {
@@ -84,6 +83,7 @@ class CSVActiveRecorder
         }
 
         $sql = substr(trim($sql), 0, -1);
+
         return $sql;
     }
 

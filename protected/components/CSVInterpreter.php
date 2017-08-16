@@ -12,7 +12,7 @@ class CSVInterpreter
     private $escape;
     private $columns;
 
-    public function __construct($filename, $delimiter = ",", $enclosure = "\"", $escape = "/")
+    public function __construct($filename, $delimiter = ";", $enclosure = "\"", $escape = "/")
     {
         if (file_exists($filename)) {
             $handle = fopen($filename, 'r');
