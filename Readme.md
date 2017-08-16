@@ -1,13 +1,8 @@
 ###########
-MagnusCallcenter 3 (BETA)
+MagnusCallcenter 3 
 ###########
 
-VERSÃO BETA  Realease porvavelmente sera publicada em september 2017
-
-Buscamos pessoas para colaborar com o projeto
-
-
-Primeiro sistema para callcenter OpenSource do Brasil.
+Primeiro sistema CRM para callcenter OpenSource do Brasil.
 
 ## Como iniciar?
 
