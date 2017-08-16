@@ -102,6 +102,8 @@ class WorkShift
                 } else {
                     Yii::app()->session['noticeSignupActually'] = false;
                 }
+            } else {
+                Yii::app()->session['noticeSignupActually'] = false;
             }
 
             //verifica se existe aberto na proxima quinzena
@@ -117,6 +119,8 @@ class WorkShift
                 } else {
                     Yii::app()->session['noticeSignupNext'] = false;
                 }
+            } else {
+                Yii::app()->session['noticeSignupActually'] = false;
             }
 
         }

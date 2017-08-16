@@ -236,30 +236,33 @@ class AuthenticationController extends BaseController
 
         MagnusLog::insertLOG(8, 'User logout - User ' . Yii::app()->session['username']);
 
-        Yii::app()->session['logged']      = false;
-        Yii::app()->session['id_user']     = false;
-        Yii::app()->session['id_agent']    = false;
-        Yii::app()->session['name_user']   = false;
-        Yii::app()->session['menu']        = array();
-        Yii::app()->session['action']      = array();
-        Yii::app()->session['currency']    = false;
-        Yii::app()->session['language']    = false;
-        Yii::app()->session['isAdmin']     = true;
-        Yii::app()->session['isOperator']  = false;
-        Yii::app()->session['isClient']    = false;
-        Yii::app()->session['id_plan']     = false;
-        Yii::app()->session['credit']      = false;
-        Yii::app()->session['username']    = false;
-        Yii::app()->session['id_group']    = false;
-        Yii::app()->session['user_type']   = false;
-        Yii::app()->session['licence']     = false;
-        Yii::app()->session['phonebookID'] = false;
-        Yii::app()->session['id_campaign'] = false;
-        Yii::app()->session['licence']     = false;
-        Yii::app()->session['email']       = false;
-        Yii::app()->session['userCount']   = false;
-        Yii::app()->session['webphone']    = false;
-        Yii::app()->session['updateAll']   = false;
+        Yii::app()->session['logged']               = false;
+        Yii::app()->session['id_user']              = false;
+        Yii::app()->session['id_agent']             = false;
+        Yii::app()->session['name_user']            = false;
+        Yii::app()->session['menu']                 = array();
+        Yii::app()->session['action']               = array();
+        Yii::app()->session['currency']             = false;
+        Yii::app()->session['language']             = false;
+        Yii::app()->session['isAdmin']              = true;
+        Yii::app()->session['isOperator']           = false;
+        Yii::app()->session['isClient']             = false;
+        Yii::app()->session['id_plan']              = false;
+        Yii::app()->session['credit']               = false;
+        Yii::app()->session['username']             = false;
+        Yii::app()->session['id_group']             = false;
+        Yii::app()->session['user_type']            = false;
+        Yii::app()->session['licence']              = false;
+        Yii::app()->session['phonebookID']          = false;
+        Yii::app()->session['id_campaign']          = false;
+        Yii::app()->session['licence']              = false;
+        Yii::app()->session['email']                = false;
+        Yii::app()->session['userCount']            = false;
+        Yii::app()->session['webphone']             = false;
+        Yii::app()->session['updateAll']            = false;
+        Yii::app()->session['noticeSignupActually'] = false;
+        Yii::app()->session['noticeSignupNext']     = false;
+        Yii::app()->session->destroy();
 
         echo json_encode(array(
             'success' => true,
