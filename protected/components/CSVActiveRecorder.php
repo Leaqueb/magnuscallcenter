@@ -50,7 +50,7 @@ class CSVActiveRecorder
 
     private function createSQL($tableName)
     {
-        $sql = "LOAD DATA INFILE '" . $this->data['filename'] . "'" .
+        $sql = "LOAD DATA LOCAL INFILE '" . $this->data['filename'] . "'" .
         " INTO TABLE " . $tableName .
         " CHARACTER SET UTF8 " .
         " FIELDS TERMINATED BY '" . $this->data['boundaries']['delimiter'] . "'" .

@@ -24,11 +24,9 @@ if [[ -e /var/www/html/callcenter/protected/commands/update2.sh ]]; then
 fi
 
 cd /var/www/html/callcenter
-## pull remote git repository
-git fetch origin master
-git reset --hard origin/master
-git clean -f -d
-git pull
+rm -rf master.tar.gz
+wget https://github.com/magnussolution/magnuscallcenter/archive/master.tar.gz
+tar xzf master.tar.gz --strip-components=1
 
 ##update database
 php /var/www/html/callcenter/cron.php UpdateMysql

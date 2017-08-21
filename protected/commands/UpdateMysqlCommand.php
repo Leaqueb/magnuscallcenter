@@ -16,8 +16,8 @@ class UpdateMysqlCommand extends ConsoleCommand
             $sql = "ALTER TABLE  `pkg_campaign` ADD  `call_limit` INT( 11 ) NOT NULL DEFAULT  '0',
                             ADD  `call_next_try` INT( 11 ) NOT NULL DEFAULT  '30',
                             ADD  `predictive` INT( 11 ) NOT NULL DEFAULT  '0';
-                    ALTERTABLE`pkg_breaks`CHANGE`start_time``start_time`TIMENOTNULLDEFAULT'00:00:00';
-                    ALTERTABLE`pkg_breaks`CHANGE`stop_time``stop_time`TIMENOTNULLDEFAULT'00:00:00';
+                    ALTER TABLE `pkg_breaks` CHANGE `start_time` `start_time` TIME NOT NULL DEFAULT '00:00:00';
+                    ALTER TABLE `pkg_breaks` CHANGE `stop_time` `stop_time` TIME NOT NULL DEFAULT '00:00:00';
                     ALTER TABLE  `pkg_phonenumber` ADD  `cpf` VARCHAR( 15 ) NOT NULL DEFAULT  '' AFTER  `dni`;
             ";
             $this->executeDB($sql);
