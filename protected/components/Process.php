@@ -4,6 +4,7 @@ class Process
 
     public static function isActive()
     {
+        LinuxAccess::exec("mkdir -p /var/run/magnus/");
         $pid = Process::getPID();
 
         if ($pid == null) {
