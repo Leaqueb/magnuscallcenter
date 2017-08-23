@@ -35,19 +35,8 @@ class CdrSumaryOperadorController extends BaseController
 
     public function init()
     {
-        if (isset($_REQUEST['group'])) {
-            unset($_REQUEST['group']);
-        }
-
-        if (isset($_REQUEST['filter']) && preg_match('/starttime/', $_REQUEST['filter'])) {
-            $filter    = $_REQUEST['filter'];
-            $filter    = $filter ? json_decode($filter) : $this->defaultFilter;
-            $date      = explode(" ", $filter[0]->value);
-            $this->day = $date[0];
-        } else {
-            $this->day    = date('Y-m-d');
-            $this->filter = " AND (starttime > '$this->day' AND starttime < '$this->day 23:59:59')";
-
+        if (isset(Yii::app()->session['group'])) {
+            unset(Yii::app()->session['group']);
         }
 
         $this->instanceModel = new LoginsCampaign;
@@ -55,6 +44,25 @@ class CdrSumaryOperadorController extends BaseController
         $this->titleReport   = Yii::t('yii', 'Calls Summary by operator');
 
         parent::init();
+    }
+
+    public function extraFilterCustom($filter)
+    {
+
+        if (!preg_match("/starttime/", $filter)) {
+            $filter .= " AND (starttime > :keyday AND starttime < :keydayend)";
+            $this->paramsFilter[':keyday']    = date('Y-m-d');
+            $this->paramsFilter[':keydayend'] = date('Y-m-d') . '23:59:59';
+
+        }
+
+        if (Yii::app()->session['isOperator']) {
+            $filter = $this->extraFilterCustomOperator($filter);
+        } else if (Yii::app()->session['isClient']) {
+            $filter = $this->extraFilterCustomClient($filter);
+        }
+
+        return $filter;
     }
 
     public function setAttributesModels($attributes, $models)
@@ -80,7 +88,10 @@ class CdrSumaryOperadorController extends BaseController
          */
         for ($i = 0; $i < count($attributes) && is_array($attributes); $i++) {
 
-            $attributes[$i]['day'] = $this->day;
+            $date = explode(" ", $attributes[$i]['starttime']);
+            $day  = $date[0];
+
+            $attributes[$i]['day'] = $day;
 
             $modelLoginsCampaign = $this->abstractModel->findAll(
                 array(

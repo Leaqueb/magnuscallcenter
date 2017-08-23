@@ -67,6 +67,9 @@ class PhoneNumberController extends BaseController
 
         if (isset($values['id_user']) && Yii::app()->session['isClient'] || Yii::app()->session['isOperator']) {
             $values['id_user'] = Yii::app()->session['id_user'];
+            if ($this->isNewRecord) {
+                $values['status'] = 1;
+            }
         }
 
         if (isset($values['id_user']) && $values['id_user'] == 0) {
