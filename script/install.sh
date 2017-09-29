@@ -4,15 +4,15 @@ echo
 echo
 echo
 echo "=================================WWW.MAGNUSCALLCENTER.COM===================================";
-echo "_      _                                ____      			                              ";
-echo "|\    /|                               | ___|      _   _ 	                                  ";
-echo "| \  / | ___  ____  _ __  _   _  _____ | |    ___ | | | |	  ___  ____ _ __  _____ ____ ___  ";
+echo "_      _                                ____                                                ";
+echo "|\    /|                               | ___|      _   _                                    ";
+echo "| \  / | ___  ____  _ __  _   _  _____ | |    ___ | | | |   ___  ____ _ __  _____ ____ ___  ";
 echo "|  \/  |/   \/  _ \| '_ \| | | \| ___| | |   /   \| | | |  / _ \| __ | '_ \|_  _|| __ | | \ ";
-echo "| |\/| |  | |  (_| | | | | |_| ||____  | |__|  | || |_| |_| |_  |	__ | | | | | | | __ | _ / ";
+echo "| |\/| |  | |  (_| | | | | |_| ||____  | |__|  | || |_| |_| |_  | __ | | | | | | | __ | _ / ";
 echo "|_|  |_|\___|\___  |_| | |_____|_____|  \___|\___||___|___|\___||____|_| | | | | |____|  \  ";
-echo "                _/ |                                           	                          ";
-echo "               |__/                                            	                          ";
-echo "																		                      ";
+echo "                _/ |                                                                        ";
+echo "               |__/                                                                         ";
+echo "                                                                                            ";
 echo "============================ OPENSOURCE SYSTEM TO CALLCENTER ===============================";
 echo
 
@@ -122,28 +122,28 @@ mysqladmin -u root password $password
 
 echo "
 <IfModule mod_deflate.c>
-	AddOutputFilterByType DEFLATE text/plain
-	AddOutputFilterByType DEFLATE text/html
-	AddOutputFilterByType DEFLATE text/xml
-	AddOutputFilterByType DEFLATE text/css
-	AddOutputFilterByType DEFLATE text/javascript
-	AddOutputFilterByType DEFLATE image/svg+xml
-	AddOutputFilterByType DEFLATE image/x-icon
-	AddOutputFilterByType DEFLATE application/xml
-	AddOutputFilterByType DEFLATE application/xhtml+xml
-	AddOutputFilterByType DEFLATE application/rss+xml
-	AddOutputFilterByType DEFLATE application/javascript
-	AddOutputFilterByType DEFLATE application/x-javascript
-	DeflateCompressionLevel 9
-	BrowserMatch ^Mozilla/4 gzip-only-text/html
-	BrowserMatch ^Mozilla/4\.0[678] no-gzip
-	BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
-	BrowserMatch \bOpera !no-gzip
-	DeflateFilterNote Input instream
-	DeflateFilterNote Output outstream
-	DeflateFilterNote Ratio ratio
-	LogFormat '\"%r\" %{outstream}n/%{instream}n (%{ratio}n%%)' deflate
-	CustomLog logs/deflate_log DEFLATE
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE image/x-icon
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    DeflateCompressionLevel 9
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+    BrowserMatch \bOpera !no-gzip
+    DeflateFilterNote Input instream
+    DeflateFilterNote Output outstream
+    DeflateFilterNote Ratio ratio
+    LogFormat '\"%r\" %{outstream}n/%{instream}n (%{ratio}n%%)' deflate
+    CustomLog logs/deflate_log DEFLATE
 </IfModule>
 " >> /etc/httpd/conf.d/deflate.conf
 
@@ -267,12 +267,12 @@ exten => 5555,1,Goto(spycall,\$\{EXTEN\},1)
 
 [spycall];extension for spy customers
 exten => 5555,1,NoOp(Escuta remota)
-	same => n,Answer
-	same => n,Authenticate(3003)
-	same => n,WaitExten(5)
+    same => n,Answer
+    same => n,Authenticate(3003)
+    same => n,WaitExten(5)
 
 exten => _XXXXX.,1,ChanSpy(SIP/\$\{EXTEN\},bq)
-	same =>n,Hangup()
+    same =>n,Hangup()
 
 [macro-queuemacro]
 exten => s,1,AGI(magnus,queuemacro)
@@ -406,8 +406,14 @@ Disallow: /callcenter/
 
 
 yum install -y epel-release
-yum install -y fail2ban 
-yum install -y fail2ban fail2ban-systemd iptables-services
+yum install -y iptables-services
+
+yum install -y iptables-services
+rm -rf /etc/fail2ban
+cd /tmp
+git clone https://github.com/fail2ban/fail2ban.git
+cd /tmp/fail2ban
+python setup.py install
 
 systemctl mask firewalld.service
 systemctl enable iptables.service
@@ -445,31 +451,14 @@ service iptables save
 service iptables restart
 
 
+echo
+echo "Fail2ban configuration!"
+echo
 
-echo "
-[INCLUDES]
-[Definition]
-
-failregex = NOTICE.* .*: Registration from '.*' failed for '<HOST>:.*' - Wrong password
-            NOTICE.* .*: Registration from '.*' failed for '<HOST>:.*' - No matching peer found
-            NOTICE.* .*: Registration from '.*' failed for '<HOST>:.*' - No matching peer found
-            NOTICE.* .*: Registration from '.*' failed for '<HOST>:.*' - Username/auth name mismatch
-            NOTICE.* .*: Registration from '.*' failed for '<HOST>:.*' - Device does not match ACL
-            NOTICE.* .*: Registration from '.*' failed for '<HOST>:.*' - Peer is not supposed to register
-            NOTICE.* .*: Registration from '.*' failed for '<HOST>:.*' - ACL error (permit/deny)
-            NOTICE.* .*: Registration from '.*' failed for '<HOST>:.*' - Device does not match ACL
-            NOTICE.* .*: Registration from '\".*\".*' failed for '<HOST>:.*' - No matching peer found
-            NOTICE.* .*: Registration from '\".*\".*' failed for '<HOST>:.*' - Wrong password
-            NOTICE.* <HOST> failed to authenticate as '.*'$
-            NOTICE.* .*: No registration for peer '.*' \(from <HOST>\)
-            NOTICE.* .*: Host <HOST> failed MD5 authentication for '.*' (.*)
-            NOTICE.* .*: Failed to authenticate user .*@<HOST>.*
-            NOTICE.* .*: <HOST> failed to authenticate as '.*'
-            NOTICE.* .*: <HOST> tried  to authenticate with nonexistent user '.*'
-            VERBOSE.*SIP/<HOST>-.*Received incoming SIP connection from unknown peer
-
-ignoreregex =
-" > /etc/fail2ban/filter.d/asterisk.conf
+echo '
+Defaults!/usr/bin/fail2ban-client !requiretty
+asterisk ALL=(ALL) NOPASSWD: /usr/bin/fail2ban-client
+' >> /etc/sudoers
 
 
 echo '
@@ -492,29 +481,6 @@ echo '
 failregex = NOTICE.* .*hangupcause to DB: 200, \[<HOST>\]
 ignoreregex =
 ' > /etc/fail2ban/filter.d/asterisk_hgc_200.conf
-
-
-echo $'
-[INCLUDES]
-before = common.conf
-[Definition]
-_daemon = sshd
-failregex = ^%(__prefix_line)s(?:error: PAM: )?Authentication failure for .* from <HOST>\s*$
-            ^%(__prefix_line)s(?:error: PAM: )?User not known to the underlying authentication module for .* from <HOST>\s*$
-            ^%(__prefix_line)sFailed (?:password|publickey) for .* from <HOST>(?: port \d*)?(?: ssh\d*)?$
-            ^%(__prefix_line)sFailed (?:password|publickey) for .* from <HOST>(?: port \d*)?(?: ssh\d*)?.*$
-            ^%(__prefix_line)sFailed (?:password|publickey) for .* from <HOST>(?: port \d*)?(?: ssh2\d*)?.*$
-            ^%(__prefix_line)sFailed (?:password|publickey) for .* from <HOST>(?: port \d*)?(?: ssh2\d*)?$
-            ^%(__prefix_line)sROOT LOGIN REFUSED.* FROM <HOST>\s*$
-            ^%(__prefix_line)s[iI](?:llegal|nvalid) user .* from <HOST>\s*$
-            ^%(__prefix_line)sUser \S+ from <HOST> not allowed because not listed in AllowUsers$
-            ^%(__prefix_line)sauthentication failure; logname=\S* uid=\S* euid=\S* tty=\S* ruser=\S* rhost=<HOST>(?:\s+user=.*)?\s*$
-            ^%(__prefix_line)srefused connect from \S+ \(<HOST>\)\s*$
-            ^%(__prefix_line)sAddress <HOST> .* POSSIBLE BREAK-IN ATTEMPT!*\s*$
-            ^%(__prefix_line)sUser \S+ from <HOST> not allowed because none of user\'s groups are listed in AllowGroups$
-
-ignoreregex =
-' > /etc/fail2ban/filter.d/sshd.conf
 
 
 
@@ -559,14 +525,18 @@ action   = iptables-allports[name=AST_HGC_200, port=5060, protocol=all]
 logpath  = /var/log/asterisk/messages
 maxretry = 20
 bantime = -1
-" > /etc/fail2ban/jail.conf
+
+[ssh-iptables]
+enabled  = true
+filter   = sshd
+action   = iptables-allports[name=SSH, port=all, protocol=all]
+logpath  = /var/log/secure
+maxretry = 3
+bantime = 600
+
+" > /etc/fail2ban/jail.local
 
 
-echo "
-[Definition]
-failregex = ^<HOST> \[.*\]$
-ignoreregex =
-" > /etc/fail2ban/filter.d/ip-blacklist.conf
 
 echo "
 [general]
@@ -583,7 +553,7 @@ messages => notice,warning,error
 fail2ban => notice
 " > /etc/asterisk/logger.conf
 
-
+mkdir /var/run/fail2ban/
 asterisk -rx "module reload logger"
 systemctl enable fail2ban 
 systemctl restart fail2ban 
