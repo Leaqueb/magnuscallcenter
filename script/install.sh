@@ -4,15 +4,15 @@ echo
 echo
 echo
 echo "=================================WWW.MAGNUSCALLCENTER.COM===================================";
-echo "_      _                                ____                                                ";
-echo "|\    /|                               | ___|      _   _                                    ";
-echo "| \  / | ___  ____  _ __  _   _  _____ | |    ___ | | | |   ___  ____ _ __  _____ ____ ___  ";
+echo "_      _                                ____      			                              ";
+echo "|\    /|                               | ___|      _   _ 	                                  ";
+echo "| \  / | ___  ____  _ __  _   _  _____ | |    ___ | | | |	  ___  ____ _ __  _____ ____ ___  ";
 echo "|  \/  |/   \/  _ \| '_ \| | | \| ___| | |   /   \| | | |  / _ \| __ | '_ \|_  _|| __ | | \ ";
-echo "| |\/| |  | |  (_| | | | | |_| ||____  | |__|  | || |_| |_| |_  | __ | | | | | | | __ | _ / ";
+echo "| |\/| |  | |  (_| | | | | |_| ||____  | |__|  | || |_| |_| |_  |	__ | | | | | | | __ | _ / ";
 echo "|_|  |_|\___|\___  |_| | |_____|_____|  \___|\___||___|___|\___||____|_| | | | | |____|  \  ";
-echo "                _/ |                                                                        ";
-echo "               |__/                                                                         ";
-echo "                                                                                            ";
+echo "                _/ |                                           	                          ";
+echo "               |__/                                            	                          ";
+echo "																		                      ";
 echo "============================ OPENSOURCE SYSTEM TO CALLCENTER ===============================";
 echo
 
@@ -63,10 +63,10 @@ clear
 cd /usr/src
 rm -rf asterisk*
 clear
-wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-14-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-13-current.tar.gz
 cd /usr/src
-tar xzvf asterisk-14-current.tar.gz
-rm -rf asterisk-14-current.tar.gz
+tar xzvf asterisk-13-current.tar.gz
+rm -rf asterisk-13-current.tar.gz
 cd asterisk-*
 useradd -c 'Asterisk PBX' -d /var/lib/asterisk asterisk
 mkdir /var/run/asterisk
@@ -122,28 +122,28 @@ mysqladmin -u root password $password
 
 echo "
 <IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/plain
-    AddOutputFilterByType DEFLATE text/html
-    AddOutputFilterByType DEFLATE text/xml
-    AddOutputFilterByType DEFLATE text/css
-    AddOutputFilterByType DEFLATE text/javascript
-    AddOutputFilterByType DEFLATE image/svg+xml
-    AddOutputFilterByType DEFLATE image/x-icon
-    AddOutputFilterByType DEFLATE application/xml
-    AddOutputFilterByType DEFLATE application/xhtml+xml
-    AddOutputFilterByType DEFLATE application/rss+xml
-    AddOutputFilterByType DEFLATE application/javascript
-    AddOutputFilterByType DEFLATE application/x-javascript
-    DeflateCompressionLevel 9
-    BrowserMatch ^Mozilla/4 gzip-only-text/html
-    BrowserMatch ^Mozilla/4\.0[678] no-gzip
-    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
-    BrowserMatch \bOpera !no-gzip
-    DeflateFilterNote Input instream
-    DeflateFilterNote Output outstream
-    DeflateFilterNote Ratio ratio
-    LogFormat '\"%r\" %{outstream}n/%{instream}n (%{ratio}n%%)' deflate
-    CustomLog logs/deflate_log DEFLATE
+	AddOutputFilterByType DEFLATE text/plain
+	AddOutputFilterByType DEFLATE text/html
+	AddOutputFilterByType DEFLATE text/xml
+	AddOutputFilterByType DEFLATE text/css
+	AddOutputFilterByType DEFLATE text/javascript
+	AddOutputFilterByType DEFLATE image/svg+xml
+	AddOutputFilterByType DEFLATE image/x-icon
+	AddOutputFilterByType DEFLATE application/xml
+	AddOutputFilterByType DEFLATE application/xhtml+xml
+	AddOutputFilterByType DEFLATE application/rss+xml
+	AddOutputFilterByType DEFLATE application/javascript
+	AddOutputFilterByType DEFLATE application/x-javascript
+	DeflateCompressionLevel 9
+	BrowserMatch ^Mozilla/4 gzip-only-text/html
+	BrowserMatch ^Mozilla/4\.0[678] no-gzip
+	BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+	BrowserMatch \bOpera !no-gzip
+	DeflateFilterNote Input instream
+	DeflateFilterNote Output outstream
+	DeflateFilterNote Ratio ratio
+	LogFormat '\"%r\" %{outstream}n/%{instream}n (%{ratio}n%%)' deflate
+	CustomLog logs/deflate_log DEFLATE
 </IfModule>
 " >> /etc/httpd/conf.d/deflate.conf
 
@@ -267,12 +267,12 @@ exten => 5555,1,Goto(spycall,\$\{EXTEN\},1)
 
 [spycall];extension for spy customers
 exten => 5555,1,NoOp(Escuta remota)
-    same => n,Answer
-    same => n,Authenticate(3003)
-    same => n,WaitExten(5)
+	same => n,Answer
+	same => n,Authenticate(3003)
+	same => n,WaitExten(5)
 
 exten => _XXXXX.,1,ChanSpy(SIP/\$\{EXTEN\},bq)
-    same =>n,Hangup()
+	same =>n,Hangup()
 
 [macro-queuemacro]
 exten => s,1,AGI(magnus,queuemacro)
