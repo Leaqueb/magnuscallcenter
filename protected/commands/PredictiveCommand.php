@@ -274,8 +274,6 @@ class PredictiveCommand extends ConsoleCommand
                 $criteria->limit           = $nbpage;
                 $modelPhoneNumber          = PhoneNumber::model()->findAll($criteria);
 
-                $log = $this->debug >= 5 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . $sql) : null;
-
                 if (!count($modelPhoneNumber)) {
                     echo $sql;
                     echo 'NO PHONE FOR CALL';
