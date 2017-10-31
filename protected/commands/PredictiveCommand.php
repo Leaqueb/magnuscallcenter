@@ -285,7 +285,18 @@ class PredictiveCommand extends ConsoleCommand
                 $ids = array();
                 foreach ($modelPhoneNumber as $phone) {
 
-                    $destination = $phone->number;
+                    $types = array(
+                        '0' => 'number',
+                        '1' => 'number_home',
+                        '2' => 'number_office',
+                        '3' => 'mobile',
+                    );
+
+                    $destination = $phone->{$types[$phone->try]};
+
+                    if ($types[$phone['try']] = !'number') {
+                        echo $phone->id . ", tentando ligar para outro numero ->  " . $types[$phone->try] . " " . $phone->{$types[$phone->try]} . " \n";
+                    }
 
                     $destination = Portabilidade::getDestination($destination, $phone->id_phonebook);
                     if ($phone->number != $destination) {

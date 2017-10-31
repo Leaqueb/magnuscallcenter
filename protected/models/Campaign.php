@@ -42,7 +42,7 @@ class Campaign extends Model
         return array(
             array('name', 'required'),
             array('monday, tuesday, wednesday, thursday, friday, saturday, sunday, allow_email,
-                    allow_email2,allow_email3,allow_city,allow_address,allow_state,allow_country,
+                    allow_email2,allow_email3,allow_city,allow_neighborhood,allow_address,allow_state,allow_country,
                     allow_dni,allow_mobile, allow_number_home,allow_number_office,allow_zip_code,
                     allow_company,allow_birth_date,allow_type_user,allow_sexo,allow_edad,allow_profesion,
                     allow_id_phonebook, allow_name, allow_sessiontime, allow_beneficio_number,

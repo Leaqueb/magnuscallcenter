@@ -36,5 +36,5 @@
     'telefone_fixo_comercial2' => ['telefone fixo comercial 2'],
     'telefone_fixo_comercial3' => ['telefone fixo comercial 3'],
     'prefix'                   => ['prefixo', 'codigo', 'rn1'],
-
+    'neighborhood'             => ['bairro'],
 ]?>

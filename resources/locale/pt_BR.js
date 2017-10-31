@@ -1,5 +1,6 @@
 Locale.load({
-	'The columns are miscofigurated' : 'Existe alguma coluna na 1º linha que não podemos entender',
+    'neighborhood': 'Bairro',
+    'The columns are miscofigurated': 'Existe alguma coluna na 1º linha que não podemos entender',
     'day_start': 'Dia início',
     'day_stop': 'Dia fim',
     'working': 'Trabalhando',
