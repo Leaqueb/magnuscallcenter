@@ -305,7 +305,10 @@ class PhoneNumberController extends BaseController
     public function importCsvSetAdditionalParams()
     {
         $values = $this->getAttributesRequest();
-        return [['key' => 'id_phonebook', 'value' => $values['id_phonebook']]];
+        return [
+            ['key' => 'id_phonebook', 'value' => $values['id_phonebook']],
+            ['key' => 'id_category', 'value' => 1],
+        ];
     }
 
     public function actionReprocesar()
