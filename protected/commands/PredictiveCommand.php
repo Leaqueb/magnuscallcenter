@@ -171,19 +171,24 @@ class PredictiveCommand extends ConsoleCommand
                         $operador = explode(" ", substr(trim($value), 4));
                         $operador = $operador[0];
 
-                        $sql             = "SELECT id FROM pkg_user WHERE username = '$operador'";
-                        $userPauseResult = Yii::app()->db->createCommand($sql)->queryAll();
+                        $modelCallOnline = CallOnline::model()->findAll(array(
+                            'condition' => $this->filter,
+                            'params'    => array(':key' => $operador),
+                            'with'      => array(
+                                'idUser' => array(
+                                    'condition' => "idUser.username = :key",
+                                ),
+                            ),
+                        ));
 
-                        $sql             = "SELECT time_start_cat, media_to_cat FROM pkg_call_online WHERE id_user = " . $userPauseResult[0]->id;
-                        $userPauseResult = Yii::app()->db->createCommand($sql)->queryAll();
                         /*
                         vamos tentar prever quando o operador ficara livre, pegando tempo medio que ele gasta para categorizar
                          */
-                        if (isset($userPauseResult[0]->time_start_cat)) {
+                        if (count($modelCallOnline)) {
 
-                            $pauseTime = time() - $userPauseResult[0]->time_start_cat;
+                            $pauseTime = time() - $modelCallOnline[0]->time_start_cat;
                             //se o tempo em pausa for maior que (media pausa - media ring ) e menor que a media iniciar chamada
-                            if ($pauseTime > ($userPauseResult[0]->media_to_cat - $averageRingingTime) && $pauseTime < $userPauseResult[0]->media_to_cat) {
+                            if ($pauseTime > ($modelCallOnline[0]->media_to_cat - $averageRingingTime) && $pauseTime < $modelCallOnline[0]->media_to_cat) {
 
                                 $p = 0;
                                 foreach ($operadores as $key => $value3) {
@@ -196,7 +201,7 @@ class PredictiveCommand extends ConsoleCommand
                                             break;
                                         } else {
                                             if (isset($operadores[$p])) {
-                                                $msg = "TENTAR enviar chamada para operadora   " . print_r($operador, true) . " esta em pausa a " . $pauseTime . "s e sua media de categorizacao é " . $userPauseResult[0]->media_to_cat . 's, e o tempo ringando é ' . $averageRingingTime . 's';
+                                                $msg = "TENTAR enviar chamada para operadora   " . print_r($operador, true) . " esta em pausa a " . $pauseTime . "s e sua media de categorizacao é " . $modelCallOnline[0]->media_to_cat . 's, e o tempo ringando é ' . $averageRingingTime . 's';
                                                 $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
                                                 $msg = "TENTAR Tem operador livre $operador";
                                                 $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
