@@ -219,7 +219,7 @@ class CampaignController extends BaseController
                     ":login_type"  => 'PAUSE',
                 ));
 
-            if ($modelLoginsCampaign->idBreak->mandatory and
+            if (count($modelLoginsCampaign) && $modelLoginsCampaign->idBreak->mandatory &&
                 $modelLoginsCampaign->idBreak->stop_time > date('H:i:s')) {
                 $msg = Yii::t('yii', 'You cannot unbreak becouse this break is mandatory');
                 echo json_encode(array(
@@ -245,18 +245,25 @@ class CampaignController extends BaseController
                 }
 
                 AsteriskAccess::instance()->queueUnPauseMember(Yii::app()->session['username'], $modelCampaign->name);
+            } else if (Yii::app()->session['isAdmin']) {
+
+                $modelUser = User::model()->findByPk((int) $id_user);
+                AsteriskAccess::instance()->queueUnPauseMember($modelUser->username, $modelCampaign->name);
             }
 
-            $modelLoginsCampaign->stoptime   = date('Y-m-d H:i:s');
-            $modelLoginsCampaign->total_time = strtotime(date('Y-m-d H:i:s')) - strtotime($modelLoginsCampaign->starttime);
-            try {
-                $modelLoginsCampaign->save();
-            } catch (Exception $e) {
-                Yii::log(print_r($modelLoginsCampaign->errors, true), 'info');
+            if (count($modelLoginsCampaign)) {
+
+                $modelLoginsCampaign->stoptime   = date('Y-m-d H:i:s');
+                $modelLoginsCampaign->total_time = strtotime(date('Y-m-d H:i:s')) - strtotime($modelLoginsCampaign->starttime);
+                try {
+                    $modelLoginsCampaign->save();
+                } catch (Exception $e) {
+                    Yii::log(print_r($modelLoginsCampaign->errors, true), 'info');
+                }
             }
 
             $modelOperatorStatus = OperatorStatus::model()->find(
-                "id_user = " . Yii::app()->session['id_user']);
+                "id_user = " . $id_user);
             $modelOperatorStatus->time_free = time();
             $modelOperatorStatus->save();
 
