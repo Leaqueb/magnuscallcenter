@@ -42,8 +42,9 @@ class PredictiveAgi
         $modelPredictive->save();
 
         $startTime = time();
-        $agi->set_variable("CALLERID(num)", $agi->get_variable("CALLED", true));
-        $agi->set_callerid($agi->get_variable("CALLED", true));
+        $agi->set_callerid($callerID);
+        $agi->set_variable("CALLERID(num)", $callerID);
+        $agi->set_variable("CALLERID(all)", "$callerID < >");
 
         $agi->verbose('Predictive - Send call to Campaign ' . $modelCampaign->name, 5);
 
