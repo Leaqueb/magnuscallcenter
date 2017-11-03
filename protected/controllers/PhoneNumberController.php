@@ -81,9 +81,14 @@ class PhoneNumberController extends BaseController
     public function afterSave($model, $values)
     {
         if (Yii::app()->session['isOperator']) {
-            $modeUser                         = User::model()->findByPk(Yii::app()->session['id_user']);
-            $modeUser->id_current_phonenumber = null;
-            $modeUser->save();
+            $modelCampaign = Campaign::model()->findByPk((int) Yii::app()->session['id_campaign']);
+            $modeUser      = User::model()->findByPk(Yii::app()->session['id_user']);
+
+            if (count($modelCampaign) && $modelCampaign->predictive != 1) {
+
+                $modeUser->id_current_phonenumber = null;
+                $modeUser->save(); //
+            };
 
             $modelOperatorStatus = OperatorStatus::model()->find(
                 "id_user = " . Yii::app()->session['id_user']);
