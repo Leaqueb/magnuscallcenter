@@ -89,7 +89,7 @@ class Util
         while ($existsVoucher) {
             $randVoucher = Util::generatePassword(6, false, false, true, false);
             $sql         = "SELECT count(id) FROM pkg_voucher
-			WHERE voucher LIKE :randVoucher OR (SELECT count(id) FROM pkg_user WHERE callingcard_pin LIKE :randVoucher) > 0";
+            WHERE voucher LIKE :randVoucher OR (SELECT count(id) FROM pkg_user WHERE callingcard_pin LIKE :randVoucher) > 0";
             $command = Yii::app()->db->createCommand($sql);
             $command->bindValue(":randVoucher", $randVoucher, PDO::PARAM_STR);
             $countVoucher = $command->queryAll();
@@ -197,12 +197,12 @@ class Util
             $turno = 'T';
         } else {
             $msg = Yii::t('yii',
-                "Usted no se puede loquear porque no esta dentro de ningun turno, campaña:") .
-            $modelCampaign->name . Yii::t('yii', ".<br><br>Seleccione otra campaña");
+                "Você nāo pode entrar nesta campanha porque nao esta dentro de nenhum turno.") .
+            $modelCampaign->name . Yii::t('yii', ".<br><br>Selecione outra campanha");
 
             echo json_encode(array(
-                $this->nameSuccess => false,
-                $this->nameMsg     => $msg,
+                'success' => false,
+                'msg'     => $msg,
             ));
             exit;
         }

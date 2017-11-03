@@ -50,7 +50,8 @@ class CampaignController extends BaseController
 
     public function actionLoginOut()
     {
-        $id_campaign = $_POST['id'];
+        $id_campaign = $_REQUEST['id'];
+        // $_POST['action'] = 'logout';
 
         $predictive = false;
 
@@ -71,13 +72,14 @@ class CampaignController extends BaseController
         if (is_numeric($id_campaign)) {
             $modelCampaign = Campaign::model()->findByPk((int) $id_campaign);
         } else {
-            $modelCampaign = Campaign::model()->find("name = :campaign_name", array(":campaign_name" => $id_campaign));
-        }
 
-        $turno = Util::detectTurno($modelCampaign);
+            $modelCampaign = Campaign::model()->find("name = :key", array(":key" => $id_campaign));
+        }
 
         //faz login do operador quando for uma campanha que nao usa o sistema
         if ($_POST['action'] == 'login') {
+
+            $turno = Util::detectTurno($modelCampaign);
 
             $modelUser->id_campaign = $id_campaign;
             $modelUser->save();
@@ -130,28 +132,6 @@ class CampaignController extends BaseController
             //$turno = $this->detectTurno($resultNameCampaign,$currentyTime);
             AsteriskAccess::instance()->queueRemoveMember(Yii::app()->session['username'], $modelCampaign->name);
 
-            /*
-            if ($modelUser->training == 1) {
-
-            $sql = "SELECT turno, starttime FROM pkg_logins_campaign WHERE id_user = ".Yii::app()->session['id_user']." AND stoptime = '0000-00-00 00:00:00'  AND id_campaign = ".$resultNameCampaign[0]['id'];
-            $userOnlineResult = Yii::app()->db->createCommand($sql)->queryAll();
-
-            $sql = "DELETE FROM pkg_logins_campaign WHERE id_user = ".Yii::app()->session['id_user']." AND stoptime = '0000-00-00 00:00:00'  AND id_campaign = ".$resultNameCampaign[0]['id'];
-            Yii::app()->db->createCommand($sql)->execute();
-
-            $sql  = "SELECT config_value FROM pkg_configuration WHERE config_key = 'valor_hora'";
-            $configResult   = Yii::app()->db->createCommand($sql)->queryAll();
-            $valorSegundo = $configResult[0]['config_value'] / 3600;
-
-            $totalTimePause = strtotime(date('Y-m-d H:i:s')) - strtotime ($userOnlineResult[0]['starttime']) ;
-
-            $totalPricePause = number_format($totalTimePause * $valorSegundo,2);
-
-            $sql = "INSERT INTO pkg_billing (id_user, id_campaign, `date`, total_price, total_time, turno) VALUES ( ".Yii::app()->session['id_user'].", '-4', '".date('Y-m-d')."', '$totalPricePause', '$totalTimePause', '".$userOnlineResult[0]['turno']."')";
-            Yii::app()->db->createCommand($sql)->execute();
-
-            }*/
-
             $modelPhonenumber = PhoneNumber::model()->findByPk($modelUser->id_current_phonenumber);
             if (count($modelPhonenumber)) {
                 $modelPhonenumber->id_user = null;
@@ -186,6 +166,8 @@ class CampaignController extends BaseController
 
             $msg = Yii::t('yii', 'Usted se deslogueo con exito');
         } elseif ($_POST['action'] == 'pause') {
+
+            $turno = Util::detectTurno($modelCampaign);
 
             $modelOperatorStatus = OperatorStatus::model()->find("id_user = " . Yii::app()->session['id_user']);
             if ($modelOperatorStatus->categorizing == 1) {
