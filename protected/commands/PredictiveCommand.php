@@ -171,10 +171,9 @@ class PredictiveCommand extends ConsoleCommand
                         $operador = explode(" ", substr(trim($value), 4));
                         $operador = $operador[0];
 
-                        $modelCallOnline = CallOnline::model()->findAll(array(
-                            'condition' => $this->filter,
-                            'params'    => array(':key' => $operador),
-                            'with'      => array(
+                        $modelOperatorStatus = OperatorStatus::model()->findAll(array(
+                            'params' => array(':key' => $operador),
+                            'with'   => array(
                                 'idUser' => array(
                                     'condition' => "idUser.username = :key",
                                 ),
@@ -184,11 +183,11 @@ class PredictiveCommand extends ConsoleCommand
                         /*
                         vamos tentar prever quando o operador ficara livre, pegando tempo medio que ele gasta para categorizar
                          */
-                        if (count($modelCallOnline)) {
+                        if (count($modelOperatorStatus)) {
 
-                            $pauseTime = time() - $modelCallOnline[0]->time_start_cat;
+                            $pauseTime = time() - $modelOperatorStatus[0]->time_start_cat;
                             //se o tempo em pausa for maior que (media pausa - media ring ) e menor que a media iniciar chamada
-                            if ($pauseTime > ($modelCallOnline[0]->media_to_cat - $averageRingingTime) && $pauseTime < $modelCallOnline[0]->media_to_cat) {
+                            if ($pauseTime > ($modelOperatorStatus[0]->media_to_cat - $averageRingingTime) && $pauseTime < $modelOperatorStatus[0]->media_to_cat) {
 
                                 $p = 0;
                                 foreach ($operadores as $key => $value3) {
@@ -201,7 +200,7 @@ class PredictiveCommand extends ConsoleCommand
                                             break;
                                         } else {
                                             if (isset($operadores[$p])) {
-                                                $msg = "TENTAR enviar chamada para operadora   " . print_r($operador, true) . " esta em pausa a " . $pauseTime . "s e sua media de categorizacao é " . $modelCallOnline[0]->media_to_cat . 's, e o tempo ringando é ' . $averageRingingTime . 's';
+                                                $msg = "TENTAR enviar chamada para operadora   " . print_r($operador, true) . " esta em pausa a " . $pauseTime . "s e sua media de categorizacao é " . $modelOperatorStatus[0]->media_to_cat . 's, e o tempo ringando é ' . $averageRingingTime . 's';
                                                 $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
                                                 $msg = "TENTAR Tem operador livre $operador";
                                                 $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . ' ' . $msg) : null;
