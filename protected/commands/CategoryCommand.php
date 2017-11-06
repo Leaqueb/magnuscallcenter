@@ -28,7 +28,11 @@ class CategoryCommand extends ConsoleCommand
                 $cdr->save();
 
             } else {
-                echo $cdr->countCall . 'tem mais que 1 ';
+                /*
+                tem mais de 1 chamada para o mesmo numero
+                atualizar no CDR todos os numeros para numero invalido.
+                e alterar a ultima chamada conforme a id_category no phonenumber
+                 */
                 Cdr::model()->updateAll(array('id_category' => 3), 'id_phonenumber = :key', array(':key' => $cdr->id_phonenumber));
 
                 $modelCdr2 = Cdr::model()->find(array(
