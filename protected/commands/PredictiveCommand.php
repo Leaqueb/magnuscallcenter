@@ -145,7 +145,7 @@ class PredictiveCommand extends ConsoleCommand
 
                                 if (($value2[$operador] + $sleepTime) > time()) {
                                     $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ .
-                                        " Acabamos de gerar uma chamada para operador $operador nao gerar outra: " . gmdate("Y-m-d H:i:s", $value2[$operador])) : null;
+                                        " Acabamos de gerar uma chamada para operador $operador nao gerar outra: " . date("Y-m-d H:i:s", $value2[$operador])) : null;
                                     continue 2;
                                 } else {
                                     if (isset($operadores[$s])) {
@@ -196,7 +196,7 @@ class PredictiveCommand extends ConsoleCommand
 
                                         if (($value3[$operador] + $sleepTime) > time()) {
 
-                                            $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . " ---------->TENTAR Acabamos de gerar uma chamada para operador $operador nao gerar outra: " . gmdate("Y-m-d H:i:s", $value3[$operador])) : null;
+                                            $log = $this->debug >= 1 ? MagnusLog::writeLog(LOGFILE, ' line:' . __LINE__ . " ---------->TENTAR Acabamos de gerar uma chamada para operador $operador nao gerar outra: " . date("Y-m-d H:i:s", $value3[$operador])) : null;
                                             break;
                                         } else {
                                             if (isset($operadores[$p])) {
@@ -344,6 +344,7 @@ class PredictiveCommand extends ConsoleCommand
 
                     // gerar os arquivos .call
                     $call = "Channel: " . $dialstr . "\n";
+                    $call .= "CallerID:" . $phone->number . "\n";
                     $call .= "MaxRetries: 0\n";
                     $call .= "RetryTime: 1\n";
                     $call .= "WaitTime: 45\n";
