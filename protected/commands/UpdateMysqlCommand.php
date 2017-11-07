@@ -39,6 +39,16 @@ class UpdateMysqlCommand extends ConsoleCommand
             $sql     = "UPDATE pkg_configuration SET config_value = '" . $version . "' WHERE config_key = 'version' ";
             $this->executeDB($sql);
         }
+        if ($version == '3.0.2') {
+
+            $sql = "INSERT INTO pkg_configuration VALUES (NULL, 'Tolerancia para mais e para menos para pausas obrigatorias', 'break_tolerance', '3', 'Tolerancia para mais e para menos para pausas obrigatorias', 'global', '1');;
+            ";
+            $this->executeDB($sql);
+
+            $version = '3.0.3';
+            $sql     = "UPDATE pkg_configuration SET config_value = '" . $version . "' WHERE config_key = 'version' ";
+            $this->executeDB($sql);
+        }
 
     }
 

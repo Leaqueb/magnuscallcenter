@@ -29,41 +29,41 @@ class BreaksController extends BaseController
     }
     public static function checkMandatoryBreak($status)
     {
-        $mandotory   = false;
-        $modelBreaks = Breaks::model()->find(" start_time < '" . date('H:i:s') . "' AND
-                        stop_time > '" . date('H:i:s') . "'  AND mandatory = 1");
+        $mandotory       = false;
+        $modelConfig     = Configuration::model()->find('config_key = :key', array(':key' => 'break_tolerance'));
+        $break_tolerance = $modelConfig->config_value;
+        $toleranceStart  = date("H:i:s", strtotime(date('H:i') . " + " . $break_tolerance . " minutes"));
 
-        if (count($modelBreaks) > 0 && $status != 'INUSE') {
+        $modelBreaks = Breaks::model()->find(" start_time < '" . date('H:i:s') . "' AND
+                        stop_time > '" . $toleranceStart . "'  AND mandatory = 1");
+
+        if (count($modelBreaks) > 0 && $status != 'INUSE' && $status != 'PAUSED') {
 
             $tipo = $modelBreaks->name;
 
-            if ($status != 'PAUSED') {
+            $modelCampaign = Campaign::model()->find(
+                "id = " . Yii::app()->getSession()->get('id_campaign') . " AND status = 1");
 
-                $modelCampaign = Campaign::model()->find(
-                    "id = " . Yii::app()->getSession()->get('id_campaign') . " AND status = 1");
+            $turno = Util::detectTurno($modelCampaign);
 
-                $turno = Util::detectTurno($modelCampaign);
+            AsteriskAccess::instance()->queuePauseMember(Yii::app()->session['username'], $modelCampaign->name);
 
-                AsteriskAccess::instance()->queuePauseMember(Yii::app()->session['username'], $modelCampaign->name);
-
-                $modelOperatorStatus = OperatorStatus::model()->find(
-                    "id_user = " . Yii::app()->session['id_user'] . " AND categorizing = 3");
-                if (count($modelOperatorStatus) > 0) {
-                    $modelOperatorStatus->categorizing = '0';
-                    $modelOperatorStatus->save();
-                }
-
-                $modelLoginsCampaign              = new LoginsCampaign();
-                $modelLoginsCampaign->id_user     = Yii::app()->session['id_user'];
-                $modelLoginsCampaign->id_campaign = $modelCampaign->id;
-                $modelLoginsCampaign->total_time  = 0;
-                $modelLoginsCampaign->starttime   = date('Y-m-d H:i:s');
-                $modelLoginsCampaign->turno       = $turno;
-                $modelLoginsCampaign->login_type  = 'PAUSE';
-                $modelLoginsCampaign->id_breaks   = $modelBreaks->id;
-                $modelLoginsCampaign->save();
-
+            $modelOperatorStatus = OperatorStatus::model()->find(
+                "id_user = " . Yii::app()->session['id_user'] . " AND categorizing = 3");
+            if (count($modelOperatorStatus) > 0) {
+                $modelOperatorStatus->categorizing = '0';
+                $modelOperatorStatus->save();
             }
+
+            $modelLoginsCampaign              = new LoginsCampaign();
+            $modelLoginsCampaign->id_user     = Yii::app()->session['id_user'];
+            $modelLoginsCampaign->id_campaign = $modelCampaign->id;
+            $modelLoginsCampaign->total_time  = 0;
+            $modelLoginsCampaign->starttime   = date('Y-m-d H:i:s');
+            $modelLoginsCampaign->turno       = $turno;
+            $modelLoginsCampaign->login_type  = 'PAUSE';
+            $modelLoginsCampaign->id_breaks   = $modelBreaks->id;
+            $modelLoginsCampaign->save();
 
             $status    = Yii::t('yii', "Pausa obrigatoria:") . ' ' . $tipo;
             $mandotory = true;

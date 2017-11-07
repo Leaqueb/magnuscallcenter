@@ -219,29 +219,49 @@ class CampaignController extends BaseController
                     ":login_type"  => 'PAUSE',
                 ));
 
-            if (count($modelLoginsCampaign) && $modelLoginsCampaign->idBreak->mandatory &&
-                $modelLoginsCampaign->idBreak->stop_time > date('H:i:s')) {
-                $msg = Yii::t('yii', 'You cannot unbreak becouse this break is mandatory');
-                echo json_encode(array(
-                    $this->nameSuccess => false,
-                    $this->nameMsg     => $msg,
-                ));
-                exit;
+            if (count($modelLoginsCampaign) && $modelLoginsCampaign->idBreak->mandatory) {
+                /*
+                stop_time = 12:20
+                se agora for maior que o stop time - a tolerancia
+                12:17 > 12:17 && 12:17 < 12:23
+
+                 */
+                $break_tolerance = $this->config['global']['break_tolerance'] * 60;
+                $stop_time       = strtotime(date('Y-m-d ') . $modelLoginsCampaign->idBreak->stop_time); //14:00
+
+                $startInterval = $stop_time - $break_tolerance; //13:57
+                $stopInterval  = $stop_time + $break_tolerance; //14:03
+
+                // echo time() . ' > ' . $startInterval . ' && ' . time() . '<' . $stopInterval;
+
+                //   13:57 > 13:57       &&                  13:57  <  14:03
+                if (time() > $startInterval && time() < $stopInterval) {
+                    $msg = Yii::t('yii', 'You can unbreak');
+                } else {
+
+                    $msg = Yii::t('yii', 'You cannot unbreak becouse this break is mandatory');
+                    echo json_encode(array(
+                        $this->nameSuccess => false,
+                        $this->nameMsg     => $msg,
+                    ));
+                    exit;
+                }
             }
 
             if (Yii::app()->session['isOperator']) {
 
-                $modelBreaks = Breaks::model()->findByPk((int) $modelLoginsCampaign->id_breaks);
-                $deadline    = $modelBreaks->maximum_time;
+                if ($modelLoginsCampaign->idBreak->mandatory == 0) {
+                    $deadline = $modelLoginsCampaign->idBreak->maximum_time;
 
-                if (strtotime($modelLoginsCampaign->starttime . ' +' . $modelBreaks->maximum_time . ' minutes') < strtotime('now')) {
+                    if (strtotime($modelLoginsCampaign->starttime . ' +' . $modelLoginsCampaign->idBreak->maximum_time . ' minutes') < strtotime('now')) {
 
-                    echo json_encode(array(
-                        $this->nameSuccess => false,
-                        $this->nameMsg     => Yii::t('yii', 'Pause time is over, call the supervisor to unlock the system'),
-                    ));
-                    exit();
+                        echo json_encode(array(
+                            $this->nameSuccess => false,
+                            $this->nameMsg     => Yii::t('yii', 'Pause time is over, call the supervisor to unlock the system'),
+                        ));
+                        exit();
 
+                    }
                 }
 
                 AsteriskAccess::instance()->queueUnPauseMember(Yii::app()->session['username'], $modelCampaign->name);
