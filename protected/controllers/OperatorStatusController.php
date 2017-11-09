@@ -43,8 +43,8 @@ class OperatorStatusController extends BaseController
                 $modelLoginsCampaign = LoginsCampaign::model()->find(
                     "id_user = " . $attributes[$i]['id_user'] . " AND login_type = 'PAUSE' AND stoptime = '0000-00-00 00:00:00'"
                 );
-                $attributes[$i]['pause_type'] = $modelLoginsCampaign->idBreak->name;
-                $attributes[$i]['time_free']  = time() - strtotime($modelLoginsCampaign->starttime);
+                isset($modelLoginsCampaign->idBreak->name) ? $modelLoginsCampaign->idBreak->name : 'INVALID';
+                $attributes[$i]['time_free'] = time() - strtotime($modelLoginsCampaign->starttime);
             } elseif ($attributes[$i]['queue_status'] == 2 || $attributes[$i]['queue_status'] == 6 || $attributes[$i]['queue_status'] == 1) {
                 $attributes[$i]['time_free'] = time() - $attributes[$i]['time_free'];
             } else {

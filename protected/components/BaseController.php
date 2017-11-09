@@ -1331,8 +1331,8 @@ class BaseController extends CController
                         $paramsIn = array();
 
                         foreach ($value as $keyIn => $v) {
-                            $this->paramsFilter["pIn$key"] = $v;
-                            array_push($paramsIn, ":pIn$key");
+                            $this->paramsFilter["pIn$key$keyIn"] = $v;
+                            array_push($paramsIn, ":pIn$key$keyIn");
                         }
 
                         $paramsIn = implode(',', $paramsIn);

@@ -42,6 +42,7 @@ class PredictiveAgi
         $modelPredictive->save();
 
         $startTime = time();
+        $callerID  = $agi->get_variable("CALLED", true);
         $agi->set_callerid($callerID);
         $agi->set_variable("CALLERID(num)", $callerID);
         $agi->set_variable("CALLERID(all)", "$callerID < >");

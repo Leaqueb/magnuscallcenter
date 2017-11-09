@@ -19,6 +19,19 @@ class BreaksController extends BaseController
         parent::init();
     }
 
+    public function extraFilterCustom($filter)
+    {
+        $filter .= !preg_match("/status/", $filter) ? ' AND status = 1' : false;
+
+        if (Yii::app()->session['isOperator']) {
+            $filter = $this->extraFilterCustomOperator($filter);
+        } else if (Yii::app()->session['isClient']) {
+            $filter = $this->extraFilterCustomClient($filter);
+        }
+
+        return $filter;
+    }
+
     public function extraFilterCustomOperator($filter)
     {
         //only show no madotory breaks to operator
@@ -37,7 +50,7 @@ class BreaksController extends BaseController
         $modelBreaks = Breaks::model()->find(" start_time < '" . date('H:i:s') . "' AND
                         stop_time > '" . $toleranceStart . "'  AND mandatory = 1");
 
-        if (count($modelBreaks) > 0 && $status != 'INUSE' && $status != 'PAUSED') {
+        if (count($modelBreaks) > 0 && $status != 'INUSE' && $status != 'PAUSED' && $status != 'CATEGORIZING') {
 
             $tipo = $modelBreaks->name;
 

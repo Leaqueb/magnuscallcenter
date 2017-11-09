@@ -219,7 +219,7 @@ class CampaignController extends BaseController
                     ":login_type"  => 'PAUSE',
                 ));
 
-            if (count($modelLoginsCampaign) && $modelLoginsCampaign->idBreak->mandatory) {
+            if (Yii::app()->session['isOperator'] && count($modelLoginsCampaign) && $modelLoginsCampaign->idBreak->mandatory) {
                 /*
                 stop_time = 12:20
                 se agora for maior que o stop time - a tolerancia
