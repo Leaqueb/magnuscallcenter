@@ -52,7 +52,7 @@ class CdrSumaryOperadorController extends BaseController
         if (!preg_match("/starttime/", $filter)) {
             $filter .= " AND (starttime > :keyday AND starttime < :keydayend)";
             $this->paramsFilter[':keyday']    = date('Y-m-d');
-            $this->paramsFilter[':keydayend'] = date('Y-m-d') . '23:59:59';
+            $this->paramsFilter[':keydayend'] = date('Y-m-d') . ' 23:59:59';
 
         }
 
@@ -93,9 +93,9 @@ class CdrSumaryOperadorController extends BaseController
 
             $attributes[$i]['day'] = $day;
 
-            $modelLoginsCampaign = $this->abstractModel->findAll(
+            $modelLoginsCampaign = LoginsCampaign::model()->findAll(
                 array(
-                    'condition' => "id_campaign = " . $attributes[$i]['id_campaign'] . " AND id_user = '" . $attributes[$i]['id_user'] . "' AND (starttime > '$this->day' AND starttime < '$this->day 23:59:59') AND turno = '" . $attributes[$i]['turno'] . "'",
+                    'condition' => "id_campaign = " . $attributes[$i]['id_campaign'] . " AND id_user = '" . $attributes[$i]['id_user'] . "' AND (starttime > '$day' AND starttime < '$day 23:59:59') AND turno = '" . $attributes[$i]['turno'] . "'",
                     'order'     => 'id ASC',
                 )
             );
@@ -116,9 +116,9 @@ class CdrSumaryOperadorController extends BaseController
             $afternoonStop  = $modelCampaign->daily_afternoon_stop_time;
 
             if ($attributes[$i]['turno'] == 'M') {
-                $filterDateTurno = "(starttime > '" . $this->day . ' ' . $morningStart . "'  AND stoptime < '" . $this->day . ' ' . $morningStop . "')";
+                $filterDateTurno = "(starttime > '" . $day . ' ' . $morningStart . "'  AND stoptime < '" . $day . ' ' . $morningStop . "')";
             } elseif ($attributes[$i]['turno'] == 'T') {
-                $filterDateTurno = "(starttime > '" . $this->day . ' ' . $afternoonStart . "'  AND stoptime < '" . $this->day . ' ' . $afternoonStop . "')";
+                $filterDateTurno = "(starttime > '" . $day . ' ' . $afternoonStart . "'  AND stoptime < '" . $day . ' ' . $afternoonStop . "')";
             }
 
             $filterDateTurno .= " AND id_user = '" . $attributes[$i]['id_user'] . "' AND id_campaign = " . $modelCampaign->id;
@@ -178,14 +178,13 @@ class CdrSumaryOperadorController extends BaseController
 
     public function getStatus($attribute, $modelCampaign, $id_user_campaign, $modelLoginsCampaign)
     {
-
         if ($attribute['turno'] == 'M'
-            && (date('Y-m-d H:i:s') < $modelCampaign->daily_morning_start_time
-                || date('Y-m-d H:i:s') > $modelCampaign->daily_morning_stop_time)) {
+            && (date('H:i:s') < $modelCampaign->daily_morning_start_time
+                || date('H:i:s') > $modelCampaign->daily_morning_stop_time)) {
             $atual_status = 'LOGOUT';
         } elseif ($attribute['turno'] == 'T'
-            && (date('Y-m-d H:i:s') < $modelCampaign->daily_afternoon_start_time
-                || date('Y-m-d H:i:s') > $modelCampaign->daily_afternoon_stop_time)) {
+            && (date('H:i:s') < $modelCampaign->daily_afternoon_start_time
+                || date('H:i:s') > $modelCampaign->daily_afternoon_stop_time)) {
             $atual_status = 'LOGOUT';
         } else if (is_null($id_user_campaign)
             || $id_user_campaign != $attribute['id_campaign']
@@ -196,6 +195,7 @@ class CdrSumaryOperadorController extends BaseController
         } else {
             $atual_status = 'LOGIN';
         }
+
         return $atual_status;
     }
 
@@ -207,6 +207,7 @@ class CdrSumaryOperadorController extends BaseController
 
         //somar o tempo de todas as acoes realizada
         foreach ($modelLoginsCampaign as $key => $value) {
+
             if ($value->login_type == 'LOGIN') {
                 //se estiver logado e o tempo final for igual a 0000-00-00 00:00:00 o totaltime sera: agora - o starttime
                 if ($value->stoptime == '0000-00-00 00:00:00') {
