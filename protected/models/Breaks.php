@@ -39,7 +39,7 @@ class Breaks extends Model
     public function rules()
     {
         return array(
-            array('mandatory, maximum_time', 'numerical', 'integerOnly' => true),
+            array('mandatory, maximum_time,status', 'numerical', 'integerOnly' => true),
             array('name', 'length', 'max' => 50),
             array('start_time, stop_time', 'length', 'max' => 100),
         );
