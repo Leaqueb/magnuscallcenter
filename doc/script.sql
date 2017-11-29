@@ -295,7 +295,7 @@ CREATE TABLE `pkg_category` (
 
 LOCK TABLES `pkg_category` WRITE;
 /*!40000 ALTER TABLE `pkg_category` DISABLE KEYS */;
-INSERT INTO `pkg_category` VALUES (0,'Inactivo','',1,0),(1,'Activo','',1,0),(2,'Volver a llamar','',1,0),(3,'Contestada','',0,0),(4,'No contesta','',1,0),(5,'Numero invalido','',0,0),(6,'Rechazo','',1,0),(7,'Contestador','',1,0),(8,'Base externa','',1,0),(10,'No Pasa el Filtro','',1,0),(11,'Efectiva','',1,1),(12,'Inactivo','',1,0),(15,'Contestador Automatico','Contestador Automatico',0,0),(16,'Hogar de sólo mujeres','Hogar de sólo mujeres',0,0),(17,'Error de Base','',0,0),(18,'Ocupado','Ocupado',1,0),(21,'Numero Invalido','',0,0),(22,'Inactivo','',0,0),(23,'Entrevista Realizada','Entrevista contestada',1,0),(24,'No llamo al Centro de At. al C','No llamo al Centro de At. al C',1,0),(25,'Incorrecto','Incorrecto',1,0);
+INSERT INTO `pkg_category` VALUES (0,'Inactivo','',1,0),(1,'Activo','',1,0),(2,'Volver a llamar','',1,0),(3,'Chamada incompleta','',1,0),(4,'No contesta','',1,0),(5,'Numero invalido','',0,0),(6,'Rechazo','',1,0),(7,'Contestador','',1,0),(8,'Base externa','',1,0),(10,'No Pasa el Filtro','',1,0),(11,'Efectiva','',1,1),(12,'Inactivo','',1,0),(15,'Contestador Automatico','Contestador Automatico',0,0),(16,'Hogar de sólo mujeres','Hogar de sólo mujeres',0,0),(17,'Error de Base','',0,0),(18,'Ocupado','Ocupado',1,0),(21,'Numero Invalido','',0,0),(22,'Inactivo','',0,0),(23,'Entrevista Realizada','Entrevista contestada',1,0),(24,'No llamo al Centro de At. al C','No llamo al Centro de At. al C',1,0),(25,'Incorrecto','Incorrecto',1,0);
 /*!40000 ALTER TABLE `pkg_category` ENABLE KEYS */;
 UNLOCK TABLES;
 

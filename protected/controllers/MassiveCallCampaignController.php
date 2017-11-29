@@ -61,4 +61,22 @@ class MassiveCallCampaignController extends BaseController
             move_uploaded_file($_FILES["audio_2"]["tmp_name"], $uploadfile);
         }
     }
+
+    public function getAttributesRequest()
+    {
+        $arrPost = array_key_exists($this->nameRoot, $_POST) ? json_decode($_POST[$this->nameRoot], true) : $_POST;
+
+        /*permite salvar quando tem audio e extrafield*/
+        $id_phonebook = array();
+        foreach ($arrPost as $key => $value) {
+            if ($key == 'id_massive_call_phonebook_array') {
+                if (isset($_POST['id_massive_call_phonebook_array']) && strlen($value) > 0) {
+                    $arrPost['id_massive_call_phonebook'] = explode(",", $_POST['id_massive_call_phonebook_array']);
+                }
+
+            }
+        };
+
+        return $arrPost;
+    }
 }
