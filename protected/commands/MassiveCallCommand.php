@@ -34,6 +34,7 @@ class MassiveCallCommand extends ConsoleCommand
             'condition' => "status = 1 AND daily_start_time <= CURRENT_TIME AND daily_stop_time > CURRENT_TIME",
         )
         );
+        define('DEBUG', 0);
 
         if (DEBUG >= 1) {
             echo "\nFound " . count($modelMassiveCallCampaign) . " Campaign\n\n";
@@ -55,7 +56,7 @@ class MassiveCallCommand extends ConsoleCommand
                 $nbpage = $campaign->frequency / 60;
             }
 
-            $modelMassiveCallPhoneNumber = MassiveCallPhoneNumber::getPhoneNumbertoSend($campaign->id, $nbpage);
+            $modelMassiveCallPhoneNumber = MassiveCallPhoneNumber::getPhoneNumbertoSend($campaign->id, intval($nbpage));
 
             if (DEBUG >= 1) {
                 echo 'Found ' . count($modelMassiveCallPhoneNumber) . ' Numbers in Campaign ' . "\n";

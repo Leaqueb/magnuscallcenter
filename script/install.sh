@@ -350,6 +350,7 @@ echo "
 55 3 * * * php /var/www/html/callcenter/cron.php payments
 50 23 * * * php /var/www/html/callcenter/cron.php asistenciackeck
 * * * * * php /var/www/html/callcenter/cron.php TurnosCkeck
+* * * * * php /var/www/html/callcenter/cron.php massivecall
 * * * * * php /var/www/html/callcenter/cron.php Category
 * * * * * php /var/www/html/callcenter/cron.php predictive
 30 23 * * * php /var/www/html/callcenter/cron.php backup
