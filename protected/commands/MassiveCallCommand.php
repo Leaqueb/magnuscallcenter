@@ -34,7 +34,7 @@ class MassiveCallCommand extends ConsoleCommand
             'condition' => "status = 1 AND daily_start_time <= CURRENT_TIME AND daily_stop_time > CURRENT_TIME",
         )
         );
-        define('DEBUG', 0);
+        define('DEBUG', 5);
 
         if (DEBUG >= 1) {
             echo "\nFound " . count($modelMassiveCallCampaign) . " Campaign\n\n";
@@ -52,8 +52,10 @@ class MassiveCallCommand extends ConsoleCommand
                 //se for menos de 60 por minutos, pausar 10 segundos e dividir o total por 6
                 sleep(10);
                 $nbpage = $campaign->frequency / 6;
+                $sleep  = 60 / $campaign->frequency;
             } else {
                 $nbpage = $campaign->frequency / 60;
+                $sleep  = $campaign->frequency / 60;
             }
 
             $modelMassiveCallPhoneNumber = MassiveCallPhoneNumber::getPhoneNumbertoSend($campaign->id, intval($nbpage));
@@ -120,7 +122,7 @@ class MassiveCallCommand extends ConsoleCommand
 
                 $dialstr = "$providertech/$trunkcode/$destination";
 
-                $dialstr = "$providertech/$trunkcode/24316";
+                //$dialstr = "$providertech/$trunkcode/24316";
 
                 // gerar os arquivos .call
                 $call = "Action: Originate\n";
@@ -156,13 +158,16 @@ class MassiveCallCommand extends ConsoleCommand
             }
 
             $criteria = new CDbCriteria();
-            $criteria->addInCondition('id_phonebook', $ids);
+            $criteria->addInCondition('id', $ids);
             MassiveCallPhoneNumber::model()->updateAll(
                 array(
-                    'status' => '0',
+                    'status' => '2',
+                    'try'    => new CDbExpression('try + 1'),
                 ),
                 $criteria
             );
+
+            echo "Campain " . $campaign->name . " sent " . $i . " calls \n\n";
         }
     }
 }

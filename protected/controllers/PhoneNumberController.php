@@ -84,7 +84,11 @@ class PhoneNumberController extends BaseController
             $modelCampaign = Campaign::model()->findByPk((int) Yii::app()->session['id_campaign']);
             $modeUser      = User::model()->findByPk(Yii::app()->session['id_user']);
 
-            if (count($modelCampaign) && $modelCampaign->predictive != 1) {
+            if ($this->isNewRecord && $values['id_category'] == 8) {
+                //prende o numero adionado como base externa para poder ligar.
+                $modeUser->id_current_phonenumber = $model->id;
+                $modeUser->save();
+            } elseif (count($modelCampaign) && $modelCampaign->predictive != 1) {
 
                 $modeUser->id_current_phonenumber = null;
                 $modeUser->save(); //

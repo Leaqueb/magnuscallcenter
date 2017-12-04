@@ -36,6 +36,8 @@ class MassiveCall
 
         $agi->verbose('MASSIVE CALL' . $id_campaign, 5);
 
+        MassiveCallPhoneNumber::model()->updateByPk($id_phonenumber, array('status' => 3));
+
         $modelCampaign = MassiveCallCampaign::model()->findByPk((int) $id_campaign);
 
         $agi->verbose($modelCampaign->id_campaign);
@@ -74,10 +76,7 @@ class MassiveCall
         $agi->set_variable("CALLERID(num)", $destination);
 
         if ($res_dtmf['result'] == $modelCampaign->forward_number) {
-            $result_did                   = array();
-            $result_did[0]['did']         = $MAGNUS->dnid;
-            $result_did[0]['id_campaign'] = $modelCampaign->id_campaign;
-            Queue::callQueue($agi, $MAGNUS, $Calc, $result_did, $type);
+            Queue::queueMassivaCall($agi, $MAGNUS, $Calc, $modelCampaign);
         } else {
             $MANGUS->hangup($agi);
         }
