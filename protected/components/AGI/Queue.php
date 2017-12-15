@@ -57,8 +57,8 @@ class Queue
         }
 
         $sql = "SELECT * FROM pkg_phonenumber WHERE number = '" . $MAGNUS->destination . "' AND
-					id_phonebook IN (SELECT id_phonebook FROM pkg_campaign_phonebook WHERE
-					id_campaign = " . $campaignResult[0]['id'] . ")";
+                    id_phonebook IN (SELECT id_phonebook FROM pkg_campaign_phonebook WHERE
+                    id_campaign = " . $campaignResult[0]['id'] . ")";
         $agi->verbose($sql, 25);
         $resultPhoneNumber = Yii::app()->db->createCommand($sql)->queryAll();
 
@@ -67,7 +67,7 @@ class Queue
         } else {
 
             $sql = "INSERT INTO pkg_phonenumber (id_phonebook, number, status, id_category)
-						VALUES (:id_phonebook, :number, 1, 0)";
+                        VALUES (:id_phonebook, :number, 1, 0)";
             $command = Yii::app()->db->createCommand($sql);
             $command->bindValue(":id_phonebook", $resultPhoneBook[0]['id_phonebook'], PDO::PARAM_INT);
             $command->bindValue(":number", $MAGNUS->destination, PDO::PARAM_STR);
@@ -156,7 +156,9 @@ class Queue
         $agi->set_variable("CALLERID(num)", $agi->get_variable("CALLED", true));
         $agi->set_callerid($agi->get_variable("CALLED", true));
 
-        $agi->verbose('Receptivo - Send call to Campaign ' . $modelCampaign->name, 5);
+        $modelCampainForward = Campaign::model()->findByPk($modelCampaign->id_campaign);
+
+        $agi->verbose('Receptivo - Send call to Campaign ' . $modelCampainForward->name, 5);
         //SET uniqueid para ser atualizado a tabela pkg_predictive quando a ligação for atendida
         $agi->set_variable("UNIQUEID", $MAGNUS->uniqueid);
 
@@ -164,11 +166,11 @@ class Queue
         $agi->set_variable("CALLED", $MAGNUS->dnid);
         $agi->set_variable("PHONENUMBER_ID", $idPhoneNumber);
         $agi->set_variable("IDPHONEBOOK", $agi->get_variable("PHONENUMBER_ID", true));
-        $agi->set_variable("CAMPAIGN_ID", $modelCampaign->id);
+        $agi->set_variable("CAMPAIGN_ID", $modelCampainForward->id);
         $agi->set_variable("STARTCALL", time());
         $agi->set_variable("ALEARORIO", $aleatorio);
 
-        $agi->execute("Queue", $modelCampaign->name . ',,,,60,/var/www/html/callcenter/agi.php');
+        $agi->execute("Queue", $modelCampainForward->name . ',,,,60,/var/www/html/callcenter/agi.php');
 
         //$Calc->updateSystem($MAGNUS, $agi, $MAGNUS->dnid, $terminatecauseid);
     }
