@@ -25,11 +25,7 @@ class PredictiveAgi
         $agi->verbose("[Type Call Predictive]", 3);
         $agi->verbose(date("Y-m-d H:i:s") . " => $MAGNUS->dnid, Cliente Atendeu a chamada, campanha " . $agi->get_variable("CAMPAIGN_ID", true), 2);
 
-        // $MAGNUS->config['global']['amd'] = 1;
-        if (preg_match("/82464731/", $MAGNUS->dnid)) {
-            $MAGNUS->config['global']['amd'] = 0;
-        }
-        if ($MAGNUS->config['global']['amd'] == 1) {
+        if ($MAGNUS->config['agi-conf1']['amd'] == 1) {
             $agi->execute("AMD");
         }
 
@@ -52,7 +48,7 @@ class PredictiveAgi
         //SET uniqueid para ser atualizado a tabela pkg_predictive quando a ligação for atendida
         $agi->set_variable("UNIQUEID", $MAGNUS->uniqueid);
 
-        if ($MAGNUS->config['global']['amd'] == 1) {
+        if ($MAGNUS->config['agi-conf1']['amd'] == 1) {
             $amd_status = $agi->get_variable("AMDSTATUS", true);
             if (!preg_match("/HUMAN/", $amd_status)) {
                 $agi->verbose(date("Y-m-d H:i:s") . " => " . $MAGNUS->dnid . ': amd_status ' . $amd_status . ", hangup call", 1);
