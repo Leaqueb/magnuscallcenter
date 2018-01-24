@@ -56,11 +56,11 @@
 
 	<script type="text/javascript">
 
-    //var defaultLang= localStorage.getItem('lang') && localStorage.getItem('lang') != 'undefined' ? localStorage.getItem('lang') : 
-     var defaultLang= 'pt_BR';
-    localStorage.lang = window.lang;
-   
-    var lang = defaultLang,
+    var defaultLang= localStorage.getItem('lang') && localStorage.getItem('lang') != 'undefined' 
+                        ? localStorage.getItem('lang') 
+                        : localStorage.lang = window.lang;
+
+            var lang = defaultLang,
       localeApp = 'resources/locale/' + lang + '.js';
 
     document.write('<script type="text/javaScript" src="'+ localeApp +'"></'+'script>');
