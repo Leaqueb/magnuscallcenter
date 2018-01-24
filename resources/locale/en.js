@@ -17,6 +17,7 @@ Locale.load({
     ',': '.',
     '.': ',',
     /*Nuevas*/
+    'Operadores' : 'Operator',
     'Turno': 'Shift',
     'Llamadas': 'Calls',
     'Llamando': 'Calling',
