@@ -341,10 +341,16 @@ class PhoneNumberController extends BaseController
             'select'    => 'DISTINCT id_category',
             'join'      => $this->join,
             'condition' => $filter,
+            'params'    => $this->paramsFilter,
         ));
 
-        $sql              = "SELECT DISTINCT id_category FROM pkg_phonenumber $this->join WHERE $filter ";
-        $categorias       = Yii::app()->db->createCommand($sql)->queryAll();
+        $sql     = "SELECT DISTINCT id_category FROM pkg_phonenumber t $this->join WHERE $filter AND id_category >= 0";
+        $command = Yii::app()->db->createCommand($sql);
+        foreach ($this->paramsFilter as $key => $value) {
+            $command->bindValue(":$key", $value, PDO::PARAM_STR);
+        }
+        $categorias = $command->queryAll();
+
         $categorias_nomes = '<br>';
         foreach ($categorias as $value) {
             $sql             = "SELECT name FROM pkg_category  WHERE id = " . $value['id_category'];
@@ -352,10 +358,23 @@ class PhoneNumberController extends BaseController
             $categorias_nomes .= isset($categorias_name[0]['name']) ? $categorias_name[0]['name'] . "<br>" : '';
         }
 
-        $sql = "INSERT INTO pkg_phonenumber
-            SELECT NULL,$id_phonebook , id_user, number, status, name, email, creationdate, id_category, datebackcall, cita_concreta, info, city, address, state, country, dni, mobile, number_home, number_office, zip_code, company, birth_date, type_user, sexo, edad, profesion, mobile_2, option_1, option_2, option_3, option_4, option_5, sessiontime, email2, email3, beneficio_number, quantidade_transacoes, inicio_beneficio, beneficio_valor, banco, agencia, conta, endereco_complementar, telefone_fixo1, telefone_fixo2, telefone_fixo3, telefone_celular1, telefone_celular2, telefone_celular3, telefone_fixo_comercial1, telefone_fixo_comercial2, telefone_fixo_comercial3, parente1, fone_parente1, parente2, fone_parente2, parente3, fone_parente3, vizinho1, telefone_vizinho1, vizinho2, telefone_vizinho2, vizinho3, telefone_vizinho3 FROM pkg_phonenumber WHERE $filter";
-
-        Yii::app()->db->createCommand($sql)->execute();
+        $sql     = "DESCRIBE pkg_phonenumber";
+        $command = Yii::app()->db->createCommand($sql)->queryAll();
+        $fields  = "NULL, $id_phonebook, ";
+        foreach ($command as $key => $value) {
+            if ($value['Field'] == 'id' || $value['Field'] == 'id_phonebook') {
+                continue;
+            }
+            $fields .= $value['Field'] . ', ';
+        }
+        $fields = substr($fields, 0, -2);
+        $sql    = "INSERT INTO pkg_phonenumber
+            SELECT $fields FROM pkg_phonenumber t WHERE $filter";
+        $command = Yii::app()->db->createCommand($sql);
+        foreach ($this->paramsFilter as $key => $value) {
+            $command->bindValue(":$key", $value, PDO::PARAM_STR);
+        }
+        $categorias = $command->execute();
 
         echo json_encode(array(
             $this->nameSuccess => $this->success,
@@ -376,6 +395,7 @@ class PhoneNumberController extends BaseController
             ));
             exit;
         }
+
         $filter = $filter ? $this->createCondition(json_decode($filter)) : '';
 
         if (!preg_match('/honebook/', $filter)) {
@@ -388,8 +408,12 @@ class PhoneNumberController extends BaseController
             $filter = preg_replace("/idPhonebookname/", 'g.name', $filter);
         }
 
-        $sql = "UPDATE pkg_phonenumber a  JOIN pkg_phonebook g ON a.id_phonebook = g.id SET a.id_category = 1 WHERE a.id_category = 0 AND $filter";
-        Yii::app()->db->createCommand($sql)->execute();
+        $sql     = "UPDATE pkg_phonenumber t  JOIN pkg_phonebook g ON t.id_phonebook = g.id SET t.id_category = 1 WHERE t.id_category = 0 AND $filter";
+        $command = Yii::app()->db->createCommand($sql);
+        foreach ($this->paramsFilter as $key => $value) {
+            $command->bindValue(":$key", $value, PDO::PARAM_STR);
+        }
+        $resultAdmin = $command->execute();
 
         echo json_encode(array(
             $this->nameSuccess => true,
