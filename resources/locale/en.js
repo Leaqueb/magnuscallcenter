@@ -17,6 +17,7 @@ Locale.load({
     ',': '.',
     '.': ',',
     /*Nuevas*/
+    'Trocales':'Routes',
     'Operadores' : 'Operator',
     'Turno': 'Shift',
     'Llamadas': 'Calls',
