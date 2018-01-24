@@ -261,9 +261,9 @@ class CdrSumaryOperadorController extends BaseController
 
         $records = $this->getAttributesModels($records, array(), true);
 
-        $pathCsv = $this->pathFileCsv . $this->nameFileCsv . '.csv';
-        if (!is_dir($this->pathFileCsv)) {
-            mkdir($this->pathFileCsv, 777, true);
+        $pathCsv = $this->magnusFilesDirectory . $this->nameFileReport . '.csv';
+        if (!is_dir($this->magnusFilesDirectory)) {
+            mkdir($this->magnusFilesDirectory, 777, true);
         }
 
         $fileOpen  = fopen($pathCsv, 'w');
