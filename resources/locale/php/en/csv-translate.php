@@ -1,4 +1,5 @@
 <?php return [
+    'banco' => ['bank','bank_name','bank name'],
     'number'                   => ['numero', 'número', 'telefone', 'phone'],
     'name'                     => ['nome', 'nombre'],
     'dni'                      => ['rg', 'carteira de identidade'],
