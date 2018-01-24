@@ -282,12 +282,13 @@ class AuthenticationController extends BaseController
             if (isset(Yii::app()->session['id_campaign']) && Yii::app()->session['id_campaign'] > 0) {
 
                 $modelCampaign = Campaign::model()->findAll(array(
-                    'select'    => 'c.id_phonebook, t.name',
+                    'select'    => 'c.id_phonebook, t.name, t.open_url',
                     'join'      => "JOIN pkg_campaign_phonebook c ON t.id = c.id_campaign",
                     'condition' => "c.id_campaign = " . Yii::app()->session['id_campaign'],
                     'limit'     => 1,
                 ));
-
+                Yii::app()->session['campaign_open_url'] = isset($modelCampaign[0]->open_url)
+                ? $modelCampaign[0]->open_url : null;
                 Yii::app()->session['campaign_name'] = isset($modelCampaign[0]->name)
                 ? $modelCampaign[0]->name : null;
                 Yii::app()->session['phonebookID'] = isset($modelCampaign[0]->id_phonebook)
@@ -305,55 +306,57 @@ class AuthenticationController extends BaseController
             Yii::app()->session['action'] = $this->getActions($modelGroupModule);
             Yii::app()->session['menu']   = $this->getMenu($modelGroupModule);
 
-            $id_user       = Yii::app()->session['id_user'];
-            $id_agent      = Yii::app()->session['id_agent'];
-            $nameUser      = Yii::app()->session['name_user'];
-            $logged        = Yii::app()->session['logged'];
-            $menu          = Yii::app()->session['menu'];
-            $currency      = Yii::app()->session['currency'];
-            $language      = Yii::app()->session['language'];
-            $isAdmin       = Yii::app()->session['isAdmin'];
-            $isOperator    = Yii::app()->session['isOperator'];
-            $isClient      = Yii::app()->session['isClient'];
-            $id_plan       = Yii::app()->session['id_plan'];
-            $credit        = Yii::app()->session['credit'];
-            $username      = Yii::app()->session['username'];
-            $id_group      = Yii::app()->session['id_group'];
-            $user_type     = Yii::app()->session['user_type'];
-            $licence       = Yii::app()->session['licence'];
-            $phonebookID   = Yii::app()->session['phonebookID'];
-            $id_campaign   = Yii::app()->session['id_campaign'];
-            $campaign_name = Yii::app()->session['campaign_name'];
-            $licence       = Yii::app()->session['licence'];
-            $email         = Yii::app()->session['email'];
-            $webphone      = Yii::app()->session['webphone'];
-            $userCount     = Yii::app()->session['userCount'];
-            $updateAll     = Yii::app()->session['updateAll'];
+            $id_user           = Yii::app()->session['id_user'];
+            $id_agent          = Yii::app()->session['id_agent'];
+            $nameUser          = Yii::app()->session['name_user'];
+            $logged            = Yii::app()->session['logged'];
+            $menu              = Yii::app()->session['menu'];
+            $currency          = Yii::app()->session['currency'];
+            $language          = Yii::app()->session['language'];
+            $isAdmin           = Yii::app()->session['isAdmin'];
+            $isOperator        = Yii::app()->session['isOperator'];
+            $isClient          = Yii::app()->session['isClient'];
+            $id_plan           = Yii::app()->session['id_plan'];
+            $credit            = Yii::app()->session['credit'];
+            $username          = Yii::app()->session['username'];
+            $id_group          = Yii::app()->session['id_group'];
+            $user_type         = Yii::app()->session['user_type'];
+            $licence           = Yii::app()->session['licence'];
+            $phonebookID       = Yii::app()->session['phonebookID'];
+            $id_campaign       = Yii::app()->session['id_campaign'];
+            $campaign_name     = Yii::app()->session['campaign_name'];
+            $licence           = Yii::app()->session['licence'];
+            $email             = Yii::app()->session['email'];
+            $webphone          = Yii::app()->session['webphone'];
+            $userCount         = Yii::app()->session['userCount'];
+            $updateAll         = Yii::app()->session['updateAll'];
+            $campaign_open_url = Yii::app()->session['campaign_open_url'];
         } else {
-            $id_user       = false;
-            $id_agent      = false;
-            $nameUser      = false;
-            $logged        = false;
-            $menu          = array();
-            $currency      = false;
-            $language      = false;
-            $isAdmin       = false;
-            $isOperator    = false;
-            $isClient      = false;
-            $id_plan       = false;
-            $credit        = false;
-            $username      = false;
-            $id_group      = false;
-            $user_type     = false;
-            $licence       = false;
-            $phonebookID   = false;
-            $id_campaign   = false;
-            $licence       = false;
-            $email         = false;
-            $userCount     = false;
-            $campaign_name = false;
-            $webphone      = false;
-            $updateAll     = false;
+            $id_user           = false;
+            $id_agent          = false;
+            $nameUser          = false;
+            $logged            = false;
+            $menu              = array();
+            $currency          = false;
+            $language          = false;
+            $isAdmin           = false;
+            $isOperator        = false;
+            $isClient          = false;
+            $id_plan           = false;
+            $credit            = false;
+            $username          = false;
+            $id_group          = false;
+            $user_type         = false;
+            $licence           = false;
+            $phonebookID       = false;
+            $id_campaign       = false;
+            $licence           = false;
+            $email             = false;
+            $userCount         = false;
+            $campaign_name     = false;
+            $webphone          = false;
+            $updateAll         = false;
+            $campaign_open_url = false;
         }
 
         $language = isset(Yii::app()->session['language']) ? Yii::app()->session['language'] : Yii::app()->sourceLanguage;
@@ -386,6 +389,7 @@ class AuthenticationController extends BaseController
             'updateAll'            => $updateAll,
             'webphone'             => $webphone,
             'campaign_name'        => $campaign_name,
+            'campaign_open_url'    => $campaign_open_url,
             'logo'                 => file_exists('resources/images/logo_custom.png') ? 'resources/images/logo_custom.png' : 'resources/images/logo.png',
             'pause'                => isset(Yii::app()->session['pauseTime']) ? Yii::app()->session['pauseTime'] : null,
             'noticeSignupActually' => isset(Yii::app()->session['noticeSignupActually']) ? Yii::app()->session['noticeSignupActually'] : false,

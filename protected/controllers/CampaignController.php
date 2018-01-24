@@ -331,4 +331,9 @@ class CampaignController extends BaseController
         }
 
     }
+
+    public function actionGetUrl()
+    {
+        echo file_get_contents(Yii::app()->session['campaign_open_url']);
+    }
 }

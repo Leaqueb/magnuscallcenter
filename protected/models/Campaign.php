@@ -56,6 +56,8 @@ class Campaign extends Model
                     allow_vizinho3,allow_telefone_vizinho3, timeout, retry, wrapuptime, weight,
                     periodic-announce-frequency, announce-frequency, call_limit, call_next_try, predictive', 'numerical', 'integerOnly' => true),
             array('name, description', 'length', 'max' => 100),
+            array('open_url', 'length', 'max' => 200),
+            array('open_url', 'url'),
             array('status', 'length', 'max' => 1),
             array('startingdate, expirationdate, allow_option_1_type, allow_option_2_type, allow_option_3_type,
                     allow_option_4_type, allow_option_5_type', 'length', 'max' => 50),
