@@ -17,6 +17,10 @@ Locale.load({
     ',': '.',
     '.': ',',
     /*Nuevas*/
+    'Categorias' : 'Categories'
+    'Numeros' : 'Numbers'
+    'Agendas' : 'Phonebook'
+    'Campañas' : 'Campaign'
     'Trocales':'Routes',
     'Operadores' : 'Operator',
     'Turno': 'Shift',
